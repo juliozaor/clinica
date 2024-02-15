@@ -17,7 +17,17 @@ export default class extends BaseSeeder {
             idRol: ROLES.ADMINISTRADOR,
             usuario: '0000000',
             id: v4() 
-        }
+        },
+        {
+          nombre: 'Ejecutivo',
+          clave: '$bcrypt$v=98$r=10$SVkH7OC3YnSS6r5n+/L+9w$V9CKtEmH282nBDPHb8fa43laPN/dojE', //Super23+
+          correo: 'julio.jimenez@gmail.com',
+          fechaNacimiento: new Date('11/01/1999'),
+          identificacion: '11111111',
+          idRol: ROLES.EJECUTIVO,
+          usuario: '11111111',
+          id: v4() 
+      }
     ])
   }
 }

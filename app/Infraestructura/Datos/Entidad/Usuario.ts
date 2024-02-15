@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { BaseModel, BelongsTo, HasMany, HasOne, ManyToMany, belongsTo, column, hasMany, hasOne, manyToMany} from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, BelongsTo, belongsTo, column} from '@ioc:Adonis/Lucid/Orm';
 import { Usuario } from 'App/Dominio/Datos/Entidades/Usuario';
 import TblRoles from './Autorizacion/Rol';
 

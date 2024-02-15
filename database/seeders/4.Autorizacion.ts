@@ -17,7 +17,38 @@ export default class extends BaseSeeder {
                 rom_id: 1,
                 rom_rol_id:  ROLES.ADMINISTRADOR,
                 rom_modulo_id: MODULOS.USUARIOS
+                },
+                {
+                rom_id: 2,
+                rom_rol_id:  ROLES.ADMINISTRADOR,
+                rom_modulo_id: MODULOS.ANALIZAR
+                },
+                {
+                rom_id: 3,
+                rom_rol_id:  ROLES.ADMINISTRADOR,
+                rom_modulo_id: MODULOS.GESTIONAR
+                },
+                {
+                rom_id: 4,
+                rom_rol_id:  ROLES.ADMINISTRADOR,
+                rom_modulo_id: MODULOS.VALIDAR
+                },
+                {
+                rom_id: 5,
+                rom_rol_id:  ROLES.EJECUTIVO,
+                rom_modulo_id: MODULOS.ANALIZAR
+                },
+                {
+                rom_id: 6,
+                rom_rol_id:  ROLES.EJECUTIVO,
+                rom_modulo_id: MODULOS.GESTIONAR
+                },
+                {
+                rom_id: 7,
+                rom_rol_id:  ROLES.EJECUTIVO,
+                rom_modulo_id: MODULOS.VALIDAR
                 }
+                
             ])
     }
 

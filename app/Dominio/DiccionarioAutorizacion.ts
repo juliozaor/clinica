@@ -6,7 +6,9 @@ export const ROLES = {
 
 export const MODULOS = {
     USUARIOS: '001',
-    ARCHIVOS: '002'
+    ANALIZAR: '002',
+    GESTIONAR: '003',
+    VALIDAR: '004',
 }
 
 export const FUNCIONALIDADES = {
