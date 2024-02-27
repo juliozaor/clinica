@@ -35,7 +35,7 @@ export default class ControladorUsuario {
 
   public async actualizarUsuario ({ params, request }) {
     const payload = await request.obtenerPayloadJWT()
-    const dataUsuario = request.all()
+    const dataUsuario = request.all()    
     const usuario = await this.service.actualizarUsuario(params.id, dataUsuario, payload)
     return usuario
   }

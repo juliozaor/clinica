@@ -12,7 +12,7 @@ export class EncriptadorAdonis implements Encriptador {
       return await Hash.verify(hash, cadena)
       
     } catch (error) {
-      throw new Exception('Credenciales incorrectas, por favor intente recuperar contraseña con su correo registrado en Vigia', 400)
+      throw new Exception('Credenciales incorrectas, por favor intente recuperar contraseña con su correo', 400)
     }
     
     

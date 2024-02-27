@@ -14,10 +14,10 @@ export class RepositorioAutorizacionDB implements RepositorioAutorizacion {
 
   async obtenerRolConModulosYPermisos(idRol: string): Promise<Rol> {
     const rol = (await TblRoles.findOrFail(idRol)).obtenerRol();
-    let modulos = await this.obtenerModulosDeUnRol(idRol);
+    let modulos = await this.obtenerModulosDeUnRol(idRol);    
     modulos.forEach((modulo) => {
       rol.agregarModulo(modulo);
-    });
+    });    
     return rol;
   }
 
@@ -52,6 +52,7 @@ export class RepositorioAutorizacionDB implements RepositorioAutorizacion {
           funcionalidades.forEach((funcionalidad) => {
             modulo.agregarFuncionalidad(funcionalidad.obtenerFuncionalidad());
           });
+          
           modulos.push(modulo) ;
         
       }

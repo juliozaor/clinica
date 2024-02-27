@@ -3,4 +3,6 @@ const accion_path = '../../../app/Presentacion/Documentos/ControladorDocumentos'
 
 Route.group(() => {
   Route.get('/', accion_path + '.mostrar')
-}).prefix('api/v1/documentos').middleware('autenticacionJwt')
+  Route.patch('/:estado/:boton', accion_path + '.actualizar')
+
+}).prefix('api/v1/facturas').middleware('autenticacionJwt')

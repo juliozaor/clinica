@@ -36,19 +36,19 @@ export class ServicioUsuarios {
   }
 
   async guardarUsuario(usuario: Usuario, payload:PayloadJWT): Promise<Usuario> {
-    if(payload.idRol !== '006' && payload.idRol !== '001'){
+    if( payload.idRol !== '001'){
       throw new Error("Usted no tiene autorización para crear usuarios");      
     }
-    const clave = await this.generarContraseña.generar()
+    /* const clave = await this.generarContraseña.generar()
+    usuario.clave = await this.encriptador.encriptar(clave) */
     usuario.id = uuidv4();
-    usuario.clave = await this.encriptador.encriptar(clave)
-    usuario.usuario = usuario.identificacion.toString()
+    //usuario.usuario = usuario.identificacion.toString()
     const user = this.repositorio.guardarUsuario(usuario);
-    await this.enviadorEmail.enviarTemplate<Credenciales>({ 
+   /*  await this.enviadorEmail.enviarTemplate<Credenciales>({ 
       asunto: `Bienvenido(a) ${usuario.nombre}`, 
       destinatarios: usuario.correo,
     }, new EmailBienvenida({ clave: clave, nombre: usuario.nombre, usuario: usuario.usuario, logo: Env.get('LOGO') }))
-    
+     */
 
     return user
   }

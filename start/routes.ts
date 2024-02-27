@@ -23,5 +23,5 @@ Route.get('/recursos/*', async ({request, response}:HttpContextContract) => {
 })
 
 Route.group(() => {
-  Route.get('/consulta-oracle', accion_path + '.probar')
+  Route.get('/consulta-oracle/:id', accion_path + '.probar')
 }).prefix('api/v1')

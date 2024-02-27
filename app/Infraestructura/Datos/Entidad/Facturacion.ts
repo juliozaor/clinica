@@ -1,6 +1,7 @@
-import { BaseModel, HasOne, column, hasMany, hasOne} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, HasMany, HasOne, column, hasMany, hasOne} from '@ioc:Adonis/Lucid/Orm'
 import { DateTime } from 'luxon';
 import { TblEstados } from './Estados';
+import { TblDetalles } from './Detalles';
 
 export class TblFacturacion extends BaseModel {
   public static readonly table = 'BOTF_FACTURACION'
@@ -31,6 +32,12 @@ export class TblFacturacion extends BaseModel {
  foreignKey: 'estadoId'
  })
  public estado: HasOne<typeof TblEstados>
+
+ @hasMany( ()=> TblDetalles,{
+  localKey:'RPA_FOR_NUMERFORMU',
+ foreignKey: 'RPA_FOR_NUMERFORMU'
+ })
+ public detalles: HasMany<typeof TblDetalles>
 
 }
 

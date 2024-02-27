@@ -15,7 +15,6 @@ export class RepositorioRolDB implements RepositorioRol {
     if(!rolDB){
       throw new Exception(`No existe el rol ${idRol}`, 404)
     }
-    console.log('rol', rolDB)
     const modulos = await TblModulos.query().join('tbl_roles_modulos', (consulta)=> {
       consulta.on('tbl_modulos.mod_id', '=', 'tbl_roles_modulos.rom_modulo_id')
     }).where('tbl_roles_modulos.rom_rol_id', '=', idRol)

@@ -12,6 +12,7 @@ import { LoggerConfig } from '@ioc:Adonis/Core/Logger'
 import { ProfilerConfig } from '@ioc:Adonis/Core/Profiler'
 import { ValidatorConfig } from '@ioc:Adonis/Core/Validator'
 
+import {consultarOracleEInsertarMSSQL} from 'App/Infraestructura/Tareas/consultarOracleEInsertarMSSQL'
 /*
 |--------------------------------------------------------------------------
 | Application secret key
@@ -233,3 +234,10 @@ export const profiler: ProfilerConfig = {
 */
 export const validator: ValidatorConfig = {
 }
+
+
+const schedule = require('node-schedule');
+schedule.scheduleJob('0 0 */8 * * *', async function(){
+  await consultarOracleEInsertarMSSQL(1); //facturas
+  await consultarOracleEInsertarMSSQL(2); //Detalles 
+});

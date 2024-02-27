@@ -5,12 +5,14 @@ export class ModuloDto{
     public id: string
     public nombre: string
     public ruta: string
+    public icono: string
     public funcionalidad: FuncionalidadDto[]
 
     constructor(modulo: Modulo){
         this.id = modulo.id
         this.nombre = modulo.nombreMostrar
         this.ruta = modulo.ruta
+        this.icono = modulo.icono
         this.funcionalidad = modulo.funcionalidad.map( funcionalidad => new FuncionalidadDto(funcionalidad))
     }
 }

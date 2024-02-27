@@ -1,5 +1,5 @@
 (
-select
+select 
 	Funglbgetrutpac(rpa.pac_pac_numero) rut_pac,   
 	rpa.CON_CON_CODIGO Cod_Convenio,
 	rpa.rpa_for_fechadigit,

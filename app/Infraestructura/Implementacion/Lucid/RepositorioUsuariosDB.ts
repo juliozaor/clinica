@@ -54,7 +54,7 @@ if(params.termino){
   }
 
   async obtenerUsuarioPorUsuario (nombreUsuario: string): Promise<Usuario | null>{
-    const usuario = await TblUsuarios.query().where('usuario', '=', nombreUsuario).first()
+    const usuario = await TblUsuarios.query().where('identificacion', '=', nombreUsuario).first()
     if(usuario){
       return usuario.obtenerUsuario()
     }
@@ -70,7 +70,8 @@ if(params.termino){
 
   async actualizarUsuario (id: string, usuario: Usuario, payload?:PayloadJWT): Promise<Usuario> {
     let usuarioRetorno = await TblUsuarios.findOrFail(id)
-    const usuarioAnterior = usuarioRetorno;
+   /*  const usuarioAnterior = usuarioRetorno; */
+    
     usuarioRetorno.estableceUsuarioConId(usuario)
     await usuarioRetorno.save()
     

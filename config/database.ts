@@ -64,14 +64,16 @@ const databaseConfig: DatabaseConfig = {
     mssql: {
       client: 'mssql',
       connection: {
-        user: Env.get('MSSQL_USER'),
-        port: parseInt(Env.get('MSSQL_PORT')),
         server: Env.get('MSSQL_SERVER'),
-        password: Env.get('MSSQL_PASSWORD', ''),
+        port: parseInt(Env.get('MSSQL_PORT')),
+        user: Env.get('MSSQL_USER'),
+        password: Env.get('MSSQL_PASSWORD'),
         database: Env.get('MSSQL_DB_NAME'),
-      },
-      migrations: {
-        naturalSort: true,
+        options: {
+          encrypt: false,
+          useUTC: false,
+          trustServerCertificate: false, 
+        },
       },
       healthCheck: false,
       debug: false,

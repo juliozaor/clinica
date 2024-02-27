@@ -27,6 +27,7 @@
     "./start/Rutas/ruta_exportacion",
     "./start/Rutas/ruta_rol",
     "./start/Rutas/ruta_documentos",
+    "./start/Rutas/ruta_robot",
     "./start/Rutas/ruta_usuario"
   ],
   "providers": [
