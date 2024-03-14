@@ -9,22 +9,36 @@ import { PayloadJWT } from '../../../Dominio/Dto/PayloadJWT';
 export class RepositorioUsuariosDB implements RepositorioUsuario {
   async obtenerUsuarios (params: any): Promise<{usuarios: Usuario[], paginacion: Paginador}> {
     const usuarios: Usuario[] = []
+    const { rol, termino, pagina, limite } = params;
 
-    const consulta = TblUsuarios.query()
-    if (params.rol) {
-      consulta.where('usn_rol_id', params.rol)
+    
+
+    const consulta = TblUsuarios.query().where('usn_rol_id','<>','010')
+    if (rol) {
+      consulta.where('usn_rol_id', rol)
     }
-if(params.termino){
-  consulta.andWhere(subquery => {
-    subquery.orWhere('usn_correo', 'ilike', `%${params.termino}%`)
-    subquery.orWhere('usn_nombre', 'ilike', `%${params.termino}%`)
-    subquery.orWhere('usn_apellido', 'ilike', `%${params.termino}%`)
-    subquery.orWhere('usn_identificacion', 'ilike', `%${params.termino}%`)
-  })
+if(termino){
+  consulta.andWhere((subquery) => {
+    subquery.whereRaw("LOWER(usn_correo) LIKE LOWER(?)", [
+      `%${termino}%`,
+    ]);
+    subquery.orWhereRaw("LOWER(usn_nombre) LIKE LOWER(?)", [
+      `%${termino}%`,
+    ]);
+    subquery.orWhereRaw("LOWER(usn_apellido) LIKE LOWER(?)", [
+      `%${termino}%`,
+    ]);
+    subquery.orWhereRaw("LOWER(usn_identificacion) LIKE LOWER(?)", [
+      `%${termino}%`,
+    ]);
+    subquery.orWhereRaw("LOWER(usn_usuario) LIKE LOWER(?)", [
+      `%${termino}%`,
+    ]);
+  });
 }
     
 
-    const usuariosDB = await consulta.orderBy('usn_nombre', 'asc').paginate(params.pagina, params.limite)
+    const usuariosDB = await consulta.orderBy('usn_nombre', 'asc').paginate(pagina, limite)
 
     usuariosDB.forEach(usuariosDB => {
       usuarios.push(usuariosDB.obtenerUsuario())
@@ -54,7 +68,8 @@ if(params.termino){
   }
 
   async obtenerUsuarioPorUsuario (nombreUsuario: string): Promise<Usuario | null>{
-    const usuario = await TblUsuarios.query().where('identificacion', '=', nombreUsuario).first()
+    //const usuario = await TblUsuarios.query().where('identificacion', '=', nombreUsuario).first()
+    const usuario = await TblUsuarios.query().where('usuario', '=', nombreUsuario).first()
     if(usuario){
       return usuario.obtenerUsuario()
     }
@@ -71,6 +86,8 @@ if(params.termino){
   async actualizarUsuario (id: string, usuario: Usuario, payload?:PayloadJWT): Promise<Usuario> {
     let usuarioRetorno = await TblUsuarios.findOrFail(id)
    /*  const usuarioAnterior = usuarioRetorno; */
+   //console.log(usuario);
+   
     
     usuarioRetorno.estableceUsuarioConId(usuario)
     await usuarioRetorno.save()

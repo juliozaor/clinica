@@ -5,7 +5,7 @@ import JwtInvalidoException from 'App/Exceptions/JwtInvalidoException'
 import jwt from 'jsonwebtoken'
 
 export class ServicioAutenticacionJWT {
-  public static readonly tokenExpiraEn = '1h'
+  public static readonly tokenExpiraEn = '24h'
   public static readonly erroresJwt = {
     EXPIRADO: 'TokenExpiredError',
     INVALIDO: 'JsonWebTokenError',

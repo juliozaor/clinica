@@ -13,10 +13,14 @@ import { RepositorioAutorizacion } from 'App/Dominio/Repositorios/RepositorioAut
 import { RepositorioUsuario } from 'App/Dominio/Repositorios/RepositorioUsuario'
 import { EnviadorEmail } from 'App/Dominio/Email/EnviadorEmail'
 import { RolDto } from 'App/Presentacion/Autenticacion/Dtos/RolDto'
+import ActiveDirectoryService from 'App/Infraestructura/Servicios/ActiveDirectoryService'
+import { ServicioLogs } from './ServicioLogs'
+import Env from '@ioc:Adonis/Core/Env';
 
 export class ServicioAutenticacion {
   private servicioUsuario: ServicioUsuarios
-
+  private activeDirectoryService = new ActiveDirectoryService();
+  private servicioLogs = new ServicioLogs();
   constructor(
     private encriptador: Encriptador,
     private enviadorEmail: EnviadorEmail,
@@ -36,40 +40,67 @@ export class ServicioAutenticacion {
     const usuario = await this.verificarUsuario(identificacion)
     if (usuario instanceof Usuario) {
       if (!(await this.encriptador.comparar(clave, usuario.clave))) {
-        throw new Exception('Credenciales incorrectas, por favor intente recuperar contraseña con su correo', 400)
+        throw new Exception('Credenciales incorrectas', 400)
       }
       usuario.clave = nuevaClave
       usuario.claveTemporal = false;
       this.servicioUsuario.actualizarUsuario(usuario.id, usuario)
       return;
     }
-    throw new Exception('Credenciales incorrectas, por favor intente recuperar contraseña con su correo', 400)
+    throw new Exception('Credenciales incorrectas', 400)
   }
 
   public async iniciarSesion(usuario: string, contrasena: string): Promise<RespuestaInicioSesion> {
     const usuarioVerificado = await this.verificarUsuario(usuario)
-    let registroDeBloqueo = await this.repositorioBloqueo.obtenerRegistroPorUsuario(usuarioVerificado.identificacion)
+    /* let registroDeBloqueo = await this.repositorioBloqueo.obtenerRegistroPorUsuario(usuarioVerificado.identificacion)
     if (!registroDeBloqueo) {
       registroDeBloqueo = await this.crearRegistroDeBloqueo(usuarioVerificado.identificacion)
     }
     if (registroDeBloqueo.elUsuarioEstaBloqueado()) {
           throw new Exception('El usuario se encuentra bloqueado por exceder el número de intentos de inicio de sesión, intente recuperar contraseña', 423)
-    }
+    } */
     if (!usuarioVerificado) {
-      this.manejarIntentoFallido(registroDeBloqueo)
-          throw new Exception('Credenciales incorrectas, por favor intente recuperar contraseña con su correo', 400)
+      /* this.manejarIntentoFallido(registroDeBloqueo) */
+      this.servicioLogs.Login(usuario,'fallido','Usuario no registrado en el sistema');
+          throw new Exception('Usuario no registrado en el sistema, valide el acceso con el administrador', 400)
     }
 
-    if (!await this.encriptador.comparar(contrasena, usuarioVerificado.clave)) {
-      this.manejarIntentoFallido(registroDeBloqueo)
-          throw new Exception('Credenciales incorrectas, por favor intente recuperar contraseña con su correo', 400)
+    let isAuthenticated = true;
+    try {
+      // Autenticar al usuario en Active Directory
+      if (Env.get('DIRACT') == 1) {
+        isAuthenticated = await this.activeDirectoryService.authenticate(usuario, contrasena);        
+      }
+      
+    } catch (error) {
+      // Manejar errores     
+      this.servicioLogs.Login(usuario,'fallido',error.lde_message); 
+      throw new Exception(error.lde_message, 400)
     }
 
+    if (!isAuthenticated) {
+      this.servicioLogs.Login(usuario,'fallido','Credenciales incorrectas');
+      throw new Exception('Credenciales incorrectas', 400)
+    }
+    
+
+
+    
+if(usuarioVerificado.idRol==='010'){
+    if (!await this.encriptador.comparar(contrasena, usuarioVerificado.clave) ) {
+     // this.manejarIntentoFallido(registroDeBloqueo)
+     this.servicioLogs.Login(usuario,'fallido','Credenciales incorrectas');
+
+          throw new Exception('Credenciales incorrectas', 400)
+    }
+  }
     const rolUsuario = await this.repositorioAutorizacion.obtenerRolConModulosYPermisos(usuarioVerificado.idRol)
     const token = ServicioAutenticacionJWT.generarToken({
       documento: usuarioVerificado.identificacion,
       idRol: usuarioVerificado.idRol
     })
+
+    this.servicioLogs.Login(usuario,'exitoso','');
 
    
     return new RespuestaInicioSesion(
@@ -89,7 +120,7 @@ export class ServicioAutenticacion {
   public async verificarUsuario(usuario: string): Promise<Usuario> {
     const usuarioDB = await this.servicioUsuario.obtenerUsuarioPorUsuario(usuario)
     if (!usuarioDB) {
-      throw new Exception('Credenciales incorrectas, por favor intente recuperar contraseña con su correo', 400)
+      throw new Exception('Credenciales incorrectas!', 400)
     }
     return usuarioDB
   }

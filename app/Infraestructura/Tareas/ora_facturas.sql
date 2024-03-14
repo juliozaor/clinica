@@ -1,7 +1,7 @@
 SELECT 
-	admsalud.Funglbgetrutpac(rpa.pac_pac_numero) rut_pac,
+	  admsalud.Funglbgetrutpac(rpa.pac_pac_numero) rut_pac,
     I.TAB_TIPOIDENTGLOSA tipo,
-    Glbgetnompac(rpa.pac_pac_numero) nom_pac,
+    admsalud.Glbgetnompac(rpa.pac_pac_numero) nom_pac,
     rpa.CON_CON_CODIGO Cod_Convenio,
     TRIM(c.con_con_descripcio) convenio,
     TRIM(e.CON_EMP_DESCRIPCIO) Empresa,

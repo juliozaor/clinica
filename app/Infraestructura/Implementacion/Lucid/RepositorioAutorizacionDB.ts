@@ -28,7 +28,7 @@ export class RepositorioAutorizacionDB implements RepositorioAutorizacion {
       })
       .whereHas("rolModulo", (sqlRolModulo) => {
         sqlRolModulo.where("rom_rol_id", idRol);
-      });
+      }).orderBy('mod_orden', 'asc');
 
       let modulos: Modulo[] = [];
 

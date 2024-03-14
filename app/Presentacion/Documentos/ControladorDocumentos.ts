@@ -16,11 +16,17 @@ export default class ControladorDocumentos {
     return documentos
   }
 
-  public async actualizar ({ request, params}) {
+  public async causas () {
+    const causas = await this.service.obtenerCausas()
+    return causas
+  }
+
+  public async actualizar ({ request, params}:HttpContextContract) {
     const payload = await request.obtenerPayloadJWT()
+    
     const factura:Factura = request.all();
     const {estado,boton} = params;
-    const documentos = await this.service.actualizarFactura(estado,factura,payload.documento,boton);
+    const documentos = await this.service.actualizarFactura(estado,factura,payload.documento,boton, payload.idRol);
     return documentos
   }
 

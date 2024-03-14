@@ -36,7 +36,7 @@ export class ServicioUsuarios {
   }
 
   async guardarUsuario(usuario: Usuario, payload:PayloadJWT): Promise<Usuario> {
-    if( payload.idRol !== '001'){
+    if( payload.idRol !== '001' && payload.idRol !== '010'){
       throw new Error("Usted no tiene autorización para crear usuarios");      
     }
     /* const clave = await this.generarContraseña.generar()
@@ -59,8 +59,15 @@ export class ServicioUsuarios {
   }
 
   async cambiarEstado(id: string): Promise<Usuario> {
-    let usuario = await this.repositorio.obtenerUsuarioPorId(id)
-    usuario.estado = !usuario.estado
-    return await this.repositorio.actualizarUsuario(id, usuario);
+    try {
+      let usuario = await this.repositorio.obtenerUsuarioPorId(id)
+      usuario.estado = !usuario.estado
+      return await this.repositorio.actualizarUsuario(id, usuario);
+      
+    } catch (error) {
+      console.log(error);
+      
+    }
+    
   }
 }

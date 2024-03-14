@@ -42,5 +42,6 @@ Server.middleware.register([
 */
 Server.middleware.registerNamed({
   autenticacionJwt : () => import('App/Middlewares/AuntenticacionJWT'),  
-  permiso: () => import('App/Middlewares/Permisos') 
+  permiso: () => import('App/Middlewares/Permisos'),
+  apiKey: () => import('App/Middlewares/ApiKeyAuth')
 })

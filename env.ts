@@ -35,5 +35,8 @@ export default Env.rules({
 /*   RUTA_FICHEROS: Env.schema.string(),
 
   URL_SERVICIO_ARCHIVOS: Env.schema.string({ format: 'url' }) */
-  TZ: Env.schema.string()
+  TZ: Env.schema.string(),
+  APIKEY: Env.schema.string(),
+  DIRACT:Env.schema.number(),
+  BASEPATH: Env.schema.string()
 })

@@ -48,7 +48,7 @@ export default class ControladorUsuario {
   }
 
   public async cambiarEstado ({request, response}:HttpContextContract){
-    try{
+    try{      
       let id = request.param('id')
       await this.service.cambiarEstado(id)
       response.status(200).send('Cambio realizado correctamente')

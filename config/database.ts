@@ -8,6 +8,12 @@
 import Env from '@ioc:Adonis/Core/Env'
 import type { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
 
+interface MSSQLOptions {
+  encrypt?: boolean;
+  trustServerCertificate?: boolean;
+  instanceName?: string;
+}
+
 const databaseConfig: DatabaseConfig = {
   /*
   |--------------------------------------------------------------------------
@@ -70,10 +76,9 @@ const databaseConfig: DatabaseConfig = {
         password: Env.get('MSSQL_PASSWORD'),
         database: Env.get('MSSQL_DB_NAME'),
         options: {
-          encrypt: false,
-          useUTC: false,
-          trustServerCertificate: false, 
-        },
+          instanceName: 'PROD01', 
+          encrypt: false, 
+        } as MSSQLOptions,
       },
       healthCheck: false,
       debug: false,

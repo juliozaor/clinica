@@ -5,6 +5,7 @@ const controlador = '../../../app/Presentacion/Usuarios/ControladorUsuario'
 
 Route.group(() => {
   Route.patch('/:identificacion', `${accion_path}.actualizarUsuario`)
+  Route.put('/:id', `${controlador}.cambiarEstado`)
   Route.post('/registro', `${controlador}.guardarUsuario`)
   Route.get('/listar/:pagina?/:limite?', `${controlador}.listar`)
   Route.get('/usuario/:usuario', `${controlador}.obtenerUsuarioPorUsuario`)

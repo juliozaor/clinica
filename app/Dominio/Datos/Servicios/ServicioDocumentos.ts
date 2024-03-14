@@ -11,8 +11,12 @@ export class ServicioDocumentos{
     return this.repositorio.obtenerDocumentos(params, documento);
   }
 
-  async actualizarFactura (estado:number, factura:Factura, documento:number,boton:number): Promise<{}> {
-    return this.repositorio.actualizarFactura(estado, factura,documento,boton);
+  async obtenerCausas (): Promise<{}> {
+    return this.repositorio.obtenerCausas();
+  }
+
+  async actualizarFactura (estado:number, factura:Factura, documento:string,boton:number, rol:string): Promise<{}> {
+    return this.repositorio.actualizarFactura(estado, factura,documento,boton, rol);
   }
 
 }

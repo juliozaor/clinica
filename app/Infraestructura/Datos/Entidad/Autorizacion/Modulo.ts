@@ -19,6 +19,8 @@ export default class TblModulos extends BaseModel {
 
   @column({ columnName: 'mod_icono'}) public icono: string
 
+  @column({ columnName: 'mod_parametro'}) public parametro: string
+
   @column({ columnName: 'mod_orden'}) public orden: number
 
   @column.dateTime({ autoCreate: true, columnName: 'mod_creado' }) public creacion: DateTime
@@ -32,6 +34,7 @@ export default class TblModulos extends BaseModel {
     this.ruta = modulo.ruta
     this.icono = modulo.icono
     this.estado = modulo.estado
+    this.parametro = modulo.parametro
     this.orden = modulo.orden
     this.creacion = modulo.creacion
     this.actualizacion = modulo.actualizacion
@@ -44,6 +47,7 @@ export default class TblModulos extends BaseModel {
       this.nombreMostrar,
       this.ruta,
       this.icono,
+      this.parametro,
       this.orden,
       this.estado,
       this.creacion,

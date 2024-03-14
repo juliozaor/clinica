@@ -238,6 +238,7 @@ export const validator: ValidatorConfig = {
 
 const schedule = require('node-schedule');
 schedule.scheduleJob('0 0 */8 * * *', async function(){
+ // schedule.scheduleJob('0 */1 * * * *', async function(){
   await consultarOracleEInsertarMSSQL(1); //facturas
   await consultarOracleEInsertarMSSQL(2); //Detalles 
 });
