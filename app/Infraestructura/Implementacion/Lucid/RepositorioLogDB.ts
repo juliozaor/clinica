@@ -7,6 +7,7 @@ import { TblLogsForms } from "App/Infraestructura/Datos/Entidad/LogsForms";
 import { TblLogsRobots } from "App/Infraestructura/Datos/Entidad/LogsRobot";
 import { TblLogsOracles } from "App/Infraestructura/Datos/Entidad/LogsOracle";
 import { TblFacturacion } from "App/Infraestructura/Datos/Entidad/Facturacion";
+import { TblLogsArchivos } from "App/Infraestructura/Datos/Entidad/LogsArchivo";
 
 export class RepositorioLogDB implements RepositorioLogs {
   async obtenerLogsLogin(
@@ -86,6 +87,17 @@ export class RepositorioLogDB implements RepositorioLogs {
             `%${termino}%`,
           ]);
           subquery.orWhereRaw("LOWER(AMBITO) LIKE LOWER(?)", [`%${termino}%`]);
+        });
+      }
+    }if (tipo == 6) {
+      sql = TblLogsArchivos.query().orderBy("id", "desc");
+      if (termino) {
+        sql.andWhere((subquery) => {
+          subquery.where("accion", "LIKE", `%${termino}%`);
+          subquery.orWhereRaw("LOWER(estado) LIKE LOWER(?)", [`%${termino}%`]);
+          subquery.orWhereRaw("LOWER(archivo) LIKE LOWER(?)", [`%${termino}%`]);
+          subquery.orWhereRaw("LOWER(factura) LIKE LOWER(?)", [`%${termino}%`]);
+          subquery.orWhereRaw("LOWER(usuario) LIKE LOWER(?)", [`%${termino}%`]);
         });
       }
     }

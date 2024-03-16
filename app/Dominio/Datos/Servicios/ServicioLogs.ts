@@ -1,3 +1,4 @@
+import { TblLogsArchivos } from "App/Infraestructura/Datos/Entidad/LogsArchivo";
 import { TblLogsForms } from "App/Infraestructura/Datos/Entidad/LogsForms";
 import { TblLogsLogins } from "App/Infraestructura/Datos/Entidad/LogsLogin";
 import { TblLogsOracles } from "App/Infraestructura/Datos/Entidad/LogsOracle";
@@ -49,4 +50,16 @@ export class ServicioLogs {
     logsOracle.estado = estado;
     await logsOracle.save();
   }
+
+  public async Archivo(factura: string, archivo: string, accion: string, usuario:string, estado:string) {
+    const logsArchivo = new TblLogsArchivos();
+    logsArchivo.factura = factura;
+    logsArchivo.archivo = archivo;
+    logsArchivo.accion = accion
+    logsArchivo.usuario = usuario;
+    logsArchivo.estado = estado
+    await logsArchivo.save();
+  }
 }
+
+

@@ -5,15 +5,18 @@ import { FacturaRPA } from "App/Dominio/Datos/Entidades/facturaRPA";
 import { TblFacturaRPA } from "App/Infraestructura/Datos/Entidad/FacturaRPA";
 import { RegistroRPA } from "App/Dominio/Datos/Entidades/registroRPA";
 import { TblRegistroRPA } from "App/Infraestructura/Datos/Entidad/RegistroRPA";
-import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser';
 import path from 'path';
 import fs from 'fs';
 import Env from '@ioc:Adonis/Core/Env';
+import { TblSoporte } from "App/Infraestructura/Datos/Entidad/Soporte";
+import Database from "@ioc:Adonis/Lucid/Database";
+import { ServicioLogs } from "App/Dominio/Datos/Servicios/ServicioLogs";
+
 
 export class RepositorioArchivosDB implements RepositorioArchivo {
+  private servicioLogs = new ServicioLogs();
 
-
-  async obtenerFacturas(params: any): Promise<{ facturaRpa: FacturaRPA[]; paginacion: Paginador; }> {
+  async obtenerFacturas(params: any, documento: string): Promise<{ facturaRpa: FacturaRPA[]; paginacion: Paginador; }> {
     const {termino, pagina, limite } = params;
     const facturaRpa: FacturaRPA[] = [];
     let sql = TblFacturaRPA.query()
@@ -43,7 +46,7 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
       return { facturaRpa, paginacion };
   }
 
-  async obtenerRegistros(params: any): Promise<{ registroRpa: RegistroRPA[]; paginacion: Paginador; }> {
+  async obtenerRegistros(params: any, documento: string): Promise<{ registroRpa: RegistroRPA[]; paginacion: Paginador; }> {
     const { factura, pagina, limite} = params;
     const registroRpa: RegistroRPA[] = [];
     const sql = await TblRegistroRPA.query().where('factura',factura).orderBy('ID','desc').paginate(pagina, limite);
@@ -56,7 +59,7 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
       return { registroRpa, paginacion };
   }
 
-  async obtenerArchivo(nombre: string, factura:string): Promise<any> {
+  async obtenerArchivo(nombre: string, factura:string, documento: string): Promise<any> {
     if (!nombre || !factura) {
         return {
             mensaje: `El nombre  y la factura son obligatorios`,
@@ -67,12 +70,14 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
     const relativePath = Env.get('BASEPATH');    
 
     try {
-        const absolutePath = path.resolve(`${relativePath}/${factura}/${nombre}.pdf`);
+        const absolutePath = path.resolve(`${relativePath}/${factura.trim()}/${nombre}.pdf`);
 
         let archivo = fs.readFileSync(`${absolutePath}`, 'base64');
+        this.servicioLogs.Archivo(factura,nombre,'Consultar',documento,'Exitoso')
         return { archivo }
     } catch (error) {
       console.log(error);
+      this.servicioLogs.Archivo(factura,nombre,'Consultar',documento,'Fallo')
       
         return {
             mensaje: `No se encontro el archivo solicitado`,
@@ -83,22 +88,26 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
 
 }
 
-async actualizarArchivo(archivo: any, nombre: string, factura:string): Promise<any> {
+async actualizarArchivo(archivo: any, nombre: string, factura:string, documento: string): Promise<any> {
   const nombreArchivoExistente = `${nombre}.pdf` 
   const  rutaAbsoluta  = await this.crearCarpetaSiNoExiste(factura);
   try {
     await archivo.move(rutaAbsoluta, { name: nombreArchivoExistente, overwrite: true })
+    this.servicioLogs.Archivo(factura,nombre,'Actualizar',documento,'Exitoso')
+
     return {
       mensaje: `Archivo actualizado correctamente`
   }
   } catch (error) {
+    this.servicioLogs.Archivo(factura,nombre,'Actualizar',documento,'Fallo')
+
     console.log(error);
     
   }
 
 }
 
-async eliminarArchivo(nombre: string, factura:string): Promise<any> {
+async eliminarArchivo(nombre: string, factura:string, documento: string, id:number): Promise<any> {
   if (!nombre || !factura) {
       return {
           mensaje: `El nombre  y la factura son obligatorios`,
@@ -107,7 +116,7 @@ async eliminarArchivo(nombre: string, factura:string): Promise<any> {
   }
   
   const relativePath = Env.get('BASEPATH');    
-  const absolutePath = path.resolve(`${relativePath}/${factura}/${nombre}.pdf`);
+  const absolutePath = path.resolve(`${relativePath}/${factura.trim()}/${nombre}.pdf`);
 
   const eliminarArchivo = (rutaArchivo) => {
     return new Promise((resolve, reject) => {
@@ -123,19 +132,60 @@ async eliminarArchivo(nombre: string, factura:string): Promise<any> {
 
   try {
     const mensaje = await eliminarArchivo(absolutePath);
-    console.log(mensaje);
+    await Database.rawQuery(`DELETE from HRBOTCES.dbo.RegistroRPA where Factura = '${factura}' and ID=${id} `);
+    this.servicioLogs.Archivo(factura,nombre,'Eliminar',documento,'Exitoso')
+    
     return {mensaje};
 } catch (error) {
-    console.error(error);
+  this.servicioLogs.Archivo(factura,nombre,'Eliminar',documento,'Fallo')
+
     return error;
 }
 
 }
 
+async guardarArchivo(archivo: any, tiposoporte: string, factura: string, documento:string): Promise<any> {
+  const nombreArchivo = archivo.clientName; 
+  const nombreSinExtension = nombreArchivo.split('.').slice(0, -1).join('.');
+  
+  const rutaAbsoluta = await this.crearCarpetaSiNoExiste(factura);
+  try {
+    await archivo.move(rutaAbsoluta, { overwrite: true });    
+    await Database.rawQuery(`INSERT INTO HRBOTCES.dbo.RegistroRPA
+    (hora_inicio, hora_fin, estado, nombre_pdf, Tipo_soporte, Factura,  type_process, usn_id) VALUES
+    (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Procesado', '${nombreSinExtension}', '${tiposoporte}', '${factura}', 'USER', ${documento});
+    `);
+
+    
+    this.servicioLogs.Archivo(factura,nombreSinExtension,'Guardar',documento,'Exitoso')
+
+    return {
+      mensaje: `Archivo '${nombreArchivo}' guardado correctamente`
+    };
+  } catch (error) {
+    this.servicioLogs.Archivo(factura,nombreSinExtension,'Guardar',documento,'Fallo')
+
+    throw new Error('Error al guardar el archivo');
+  }
+}
+
+async obtenerSoportes(): Promise<any> {
+  let soportes
+  try {
+  soportes = await TblSoporte.query().distinct('nombre_soporte')
+   
+  } catch (error) {
+    console.log(error);
+    throw new Error('Error ');
+  }
+
+  return {soportes}
+}
 
 
-crearCarpetaSiNoExiste = async (factura) => {
-  const raiz = `${Env.get('BASEPATH')}/${factura}`
+
+crearCarpetaSiNoExiste = async (factura:string) => {
+  const raiz = `${Env.get('BASEPATH')}/${factura.trim()}`
   const rutaAbsoluta = path.resolve(`${raiz}`)
   if (!fs.existsSync(rutaAbsoluta)) {
       fs.mkdirSync(rutaAbsoluta);

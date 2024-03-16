@@ -9,4 +9,5 @@ Route.group(() => {
   Route.delete('', accion_path + '.eliminar').middleware('permiso:012,004')
   Route.post('', accion_path + '.crear')
   Route.get('descargar', accion_path + '.descargar')
+  Route.get('soportes', accion_path + '.soportes')
 }).prefix('api/v1/archivos').middleware('autenticacionJwt')

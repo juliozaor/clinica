@@ -49,16 +49,15 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
     });
 
     console.log("Insertando datos en tabla temporal Sql Server");
-    console.log(datosOracle?.rows.length);
 
     if (datosOracle?.rows.length > 0) {
-      
+      console.log(datosOracle?.rows.length)
       servicioLogs.Oracle("Ejecutar consulta", `Datos encontrados ${tipo}`);
       if (tipo == 1) {
-        await almacenarFacturas(datosOracle?.rows);
+       // await almacenarFacturas(datosOracle?.rows);
       }
       if (tipo == 2) {
-        await almacenarDetalles(datosOracle?.rows);
+       // await almacenarDetalles(datosOracle?.rows);
       }
     } else {
       console.log({tipo});
@@ -83,7 +82,7 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
 
     return true;
   } catch (error) {
-    // console.log(error);
+     console.log(error);
 
     await connection.close();
   }

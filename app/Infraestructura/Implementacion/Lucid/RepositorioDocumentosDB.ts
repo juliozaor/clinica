@@ -84,7 +84,6 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
     const fechaActual = DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss.SSS");
     const datos = this.servicioActualizacion.obtenerKeys(boton);
 
-    console.log(datos);
 
     try {
       factura.estadoId = estado;

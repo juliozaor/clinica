@@ -66,6 +66,7 @@ export class ServicioUsuarios {
       
     } catch (error) {
       console.log(error);
+      throw new Error("No se pudo cambiar el estado");
       
     }
     
