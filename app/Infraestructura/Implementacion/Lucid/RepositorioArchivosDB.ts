@@ -67,10 +67,11 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
         }
     }
     
-    const relativePath = Env.get('BASEPATH');    
+    //const relativePath = Env.get('BASEPATH');    
+    const  rutaAbsoluta  = await this.crearCarpetaSiNoExiste(factura);
 
     try {
-        const absolutePath = path.resolve(`${relativePath}/${factura.trim()}/${nombre}.pdf`);
+        const absolutePath = path.resolve(`${rutaAbsoluta}/${nombre}.pdf`);
 
         let archivo = fs.readFileSync(`${absolutePath}`, 'base64');
         this.servicioLogs.Archivo(factura,nombre,'Consultar',documento,'Exitoso')
@@ -185,12 +186,55 @@ async obtenerSoportes(): Promise<any> {
 
 
 crearCarpetaSiNoExiste = async (factura:string) => {
-  const raiz = `${Env.get('BASEPATH')}/${factura.trim()}`
+  const carpeta = await this.obtenerNombreCarpeta(factura.trim())
+  const raiz = `${Env.get('BASEPATH')}/${carpeta}`
   const rutaAbsoluta = path.resolve(`${raiz}`)
   if (!fs.existsSync(rutaAbsoluta)) {
       fs.mkdirSync(rutaAbsoluta);
   }
   return rutaAbsoluta;
+}
+
+
+obtenerNombreCarpeta = async (factura:string) => {
+  try {
+    const carpeta = await Database.rawQuery(`
+    select
+	f.Factura,
+	substring(f.Factura, 0,4) as alfa_num_factura,
+	trim(substring(f.Factura, 5,1000)) as numero_factura,
+	f.Convenio,
+	f.Descripcion_Convenio,
+	f.Rut,
+	c.Aseguradora,
+	f.Vr_Factura,
+	f.Fecha_Facturacion,
+	f.Documento_Identificacion,
+	f.Nro_Planilla,
+	f.Ambito,
+	f.FEcha_Formulario,
+	f.ID_Factura,
+	f.Tipo_Factura,
+	(CASE 
+		when c.Aseguradora = 'EPS SURA' THEN concat('890982608_',substring(f.Factura, 0,4),'',trim(substring(f.Factura, 5,1000)),'',f.Vr_Factura,'_PBS')
+		when c.Aseguradora = 'EPS SURA NO PBS' THEN concat('890982608_',substring(f.Factura, 0,4),'',trim(substring(f.Factura, 5,1000)),'',f.Vr_Factura,'_NO PBS')
+		when c.Aseguradora = 'MEDPLUS' THEN concat('890982608_',substring(f.Factura, 0,4),'',trim(substring(f.Factura, 5,1000)),'',f.Vr_Factura)
+		ELSE trim(substring(f.Factura, 5,1000))
+		
+	END	
+	) as Ruta_Factura
+	
+from Factura f inner join Convenio c on (c.cod_convenio = f.Convenio) 
+where
+f.Factura = '${factura}'
+    `)
+    
+    return carpeta[0].Ruta_Factura;
+    
+  } catch (error) {
+    throw new Error('No se pudo realizar la operacíon en este momento');
+    
+  }
 }
 
 }
