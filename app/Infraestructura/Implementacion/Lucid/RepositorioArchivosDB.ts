@@ -233,7 +233,7 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
         await archivo.move(rutaAbsoluta, { overwrite: true });
         console.log("El archivo se ha movido correctamente.");
       } catch (error) {
-        console.error("Error al mover el archivo:", error.message);
+      //  console.error("Error al mover el archivo:", error.message);
         throw error; // Relanzar el error para que pueda ser manejado en un nivel superior
       }
 
@@ -261,9 +261,9 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
         documento,
         "Fallo"
       );
-      console.log(error);
+     // console.log(error);
 
-      throw new Error("Error al guardar el archivo");
+     // throw new Error("Error al guardar el archivo");
     }
   }
 
