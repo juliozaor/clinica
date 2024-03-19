@@ -218,7 +218,7 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
     const rutaAbsoluta = await this.crearCarpetaSiNoExiste(factura);
     try {
       /*   await archivo.move(rutaAbsoluta, { overwrite: true });   */
-      console.log(archivo.tmpPath);
+      console.log(archivo);
       console.log(rutaAbsoluta);
 
       
