@@ -11,7 +11,6 @@ import Env from "@ioc:Adonis/Core/Env";
 import { TblSoporte } from "App/Infraestructura/Datos/Entidad/Soporte";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { ServicioLogs } from "App/Dominio/Datos/Servicios/ServicioLogs";
-import { MultipartFileContract } from "@ioc:Adonis/Core/BodyParser";
 import Application from "@ioc:Adonis/Core/Application";
 
 export class RepositorioArchivosDB implements RepositorioArchivo {
@@ -219,12 +218,12 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
 
     const rutaAbsoluta = await this.crearCarpetaSiNoExiste(factura);
     try {
+      console.log(nombreArchivo);
       // await archivo.move(rutaAbsoluta, { overwrite: true });
       const uploadDirectory = "uploads";
       const filePath = Application.tmpPath(uploadDirectory);
       archivo.tmpPath(filePath);
 
-      console.log(nombreArchivo);
       console.log(archivo.tmpPath);
        await archivo.move(rutaAbsoluta, { overwrite: true });
 
@@ -249,6 +248,8 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
       };
     } catch (error) {
       // this.servicioLogs.Archivo(factura,nombreSinExtension,'Guardar',documento,'Fallo')
+    console.log(error);
+    
       // throw new Error('Error al guardar el archivo');
     }
   }

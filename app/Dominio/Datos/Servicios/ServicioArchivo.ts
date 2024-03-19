@@ -3,7 +3,6 @@ import { Paginador } from '../../Paginador';
 import { RepositorioArchivo } from 'App/Dominio/Repositorios/RepositorioArchivo';
 import { FacturaRPA } from '../Entidades/facturaRPA';
 import { RegistroRPA } from '../Entidades/registroRPA';
-import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser';
 
 export class ServicioArchivo{
   constructor (private repositorio: RepositorioArchivo) { }
@@ -28,7 +27,7 @@ export class ServicioArchivo{
     return this.repositorio.eliminarArchivo(archivo, nombre, documento, id);
   }
 
-  async guardarArchivo (archivo:MultipartFileContract, tiposoporte: string, factura: string, documento:string) {
+  async guardarArchivo (archivo:any, tiposoporte: string, factura: string, documento:string) {
     return this.repositorio.guardarArchivo(archivo,tiposoporte, factura, documento);
   }
 
