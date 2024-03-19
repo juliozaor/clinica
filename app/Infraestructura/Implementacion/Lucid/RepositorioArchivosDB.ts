@@ -222,10 +222,8 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
       // await archivo.move(rutaAbsoluta, { overwrite: true });
       const uploadDirectory = "uploads";
       const filePath = Application.tmpPath(uploadDirectory);
-      archivo.tmpPath(filePath);
 
-      console.log(archivo.tmpPath);
-       await archivo.move(rutaAbsoluta, { overwrite: true });
+       await archivo.move(filePath, { overwrite: true });
 
 
       //await this.copyFileAsync(archivo.tmpPath, rutaAbsoluta);
