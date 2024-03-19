@@ -115,9 +115,10 @@ async eliminarArchivo(nombre: string, factura:string, documento: string, id:numb
           error: 5
       }
   }
-  
-  const relativePath = Env.get('BASEPATH');    
-  const absolutePath = path.resolve(`${relativePath}/${factura.trim()}/${nombre}.pdf`);
+
+  const carpeta = await this.obtenerNombreCarpeta(factura.trim())
+  const raiz = `${Env.get('BASEPATH')}/${carpeta}`
+  const absolutePath = path.resolve(`${raiz}`)
 
   const eliminarArchivo = (rutaArchivo) => {
     return new Promise((resolve, reject) => {
