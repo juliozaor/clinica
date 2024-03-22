@@ -15,7 +15,10 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
     await oracledb.initOracleClient();
 
     connection = await oracledb.getConnection({
-      connectString: "PRUEBAS", // Nombre del alias de servicio en tnsnames.ora
+      /* connectString: "PRUEBAS",
+      user: "ADMCES",
+      password: "S*STE#AS2021", */
+      connectString: "SALUD.WORLD",
       user: "ADMCES",
       password: "S*STE#AS2021",
     });
@@ -54,10 +57,15 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
       console.log(datosOracle?.rows.length)
       servicioLogs.Oracle("Ejecutar consulta", `Datos encontrados ${tipo}`);
       if (tipo == 1) {
-       // await almacenarFacturas(datosOracle?.rows);
+        console.log("Almacenar Formularios");
+       
+        
+        await almacenarFacturas(datosOracle?.rows);
       }
       if (tipo == 2) {
-       // await almacenarDetalles(datosOracle?.rows);
+        console.log("Almacenar Detalles");
+        
+        await almacenarDetalles(datosOracle?.rows);
       }
     } else {
       console.log({tipo});
@@ -96,7 +104,7 @@ const almacenarFacturas = async (datosOracle: []) => {
 
   console.log("Almacenar Factura");
   const Database = (await import("@ioc:Adonis/Lucid/Database")).default;
-  const facturaModel = await import("../Datos/Entidad/Facturacion");
+  //const facturaModel = await import("../Datos/Entidad/FacturacionTmp");
 
   try {
    console.log("Inicio logica formulario");
@@ -109,12 +117,50 @@ const almacenarFacturas = async (datosOracle: []) => {
 
   //2. Insertar los datos que vienen de Oracle
 
-  await facturaModel.TblFacturacion.createMany(datosOracle);
+
+  try {
+      
+    const chunkSize = 100; // Tamaño del lote
+const batches = new Array();
+
+// Dividir los datos en lotes más pequeños
+for (let i = 0; i < datosOracle.length; i += chunkSize) {
+    const chunk = datosOracle.slice(i, i + chunkSize);
+    batches.push(chunk);
+}
+
+    for (const batch of batches) {
+        const values = batch.map(dato => [
+            dato.AMBITO,
+            dato.CODIGOCENTROATEN,
+            dato.COD_CONVENIO,
+            dato.CONVENIO,
+            dato.RPA_FOR_FECHADIGIT,
+            dato.RPA_FOR_FECHATENCION,
+            dato.RPA_FOR_NUMERFORMU,
+            dato.RUT_PAC,
+            dato.VALORCTA
+        ]);
+
+        const placeholders = Array.from({ length: batch.length }, () => '(?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+        const query = `
+        INSERT INTO ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACION
+        (AMBITO, CODIGOCENTROATEN, COD_CONVENIO, CONVENIO, RPA_FOR_FECHADIGIT, RPA_FOR_FECHATENCION, RPA_FOR_NUMERFORMU, RUT_PAC, VALORCTA)
+        VALUES ${placeholders} `;
+
+        await Database.rawQuery(query, values.flat());
+    }
+
+    console.log("Inserción masiva exitosa");
+} catch (error) {
+    console.error("Error durante la inserción masiva:");
+    console.error(error);
+}
 
   //3. Crear tabla temporal para la distribucion
 
   await Database.rawQuery(
-    `TRUNCATE TABLE ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACION`
+    `TRUNCATE TABLE ${Env.get("PREFIJODB")}BOTF_TMP_IDFACTURACION`
   );
   await Database.rawQuery(`
   INSERT INTO ${Env.get("PREFIJODB")}BOTF_TMP_IDFACTURACION
@@ -238,7 +284,7 @@ const almacenarDetalles = async (datosOracle: []) => {
   servicioLogs.Oracle("Almacenar datos", "Detalles");
   console.log("Almacenar Detalle");
   const Database = (await import("@ioc:Adonis/Lucid/Database")).default;
-  const detalleModel = await import("../Datos/Entidad/Detalles");
+  //const detalleModel = await import("../Datos/Entidad/DetallesTmp");
 
   try {
 console.log("Inicio de logica detalle");
@@ -249,11 +295,53 @@ console.log("Inicio de logica detalle");
   );
 
   //2. Insertar los datos que vienen de Oracle
-  await detalleModel.TblDetalles.createMany(datosOracle);
+
+  try {
+    
+    const chunkSize = 100; // Tamaño del lote
+    const batches = new Array();
+    
+    // Dividir los datos en lotes más pequeños
+    for (let i = 0; i < datosOracle.length; i += chunkSize) {
+        const chunk = datosOracle.slice(i, i + chunkSize);
+        batches.push(chunk);
+    }
+    
+
+    // Iterar sobre los lotes y ejecutar la inserción
+    for (const batch of batches) {
+        const values = batch.map(dato => [
+            dato.RUT_PAC,
+            dato.COD_CONVENIO,
+            dato.RPA_FOR_FECHADIGIT,
+            dato.RPA_FOR_NUMERFORMU,
+            dato.ATE_PRE_CODIGO,
+            dato.PRE_PRE_DESCRIPCIO,
+            dato.PRE_TIP_DESCRIPCIO,
+            dato.RPA_FOR_FECHATENCION
+        ]);
+
+        const placeholders = Array.from({ length: batch.length }, () => '(?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+        const query = `
+        INSERT INTO ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACIONDETALLE
+        (RUT_PAC, COD_CONVENIO, RPA_FOR_FECHADIGIT, RPA_FOR_NUMERFORMU,ATE_PRE_CODIGO, PRE_PRE_DESCRIPCIO,PRE_TIP_DESCRIPCIO, RPA_FOR_FECHATENCION)
+        VALUES (${placeholders}
+    `;
+
+        // Ejecutar la consulta raw para el lote actual
+        await Database.rawQuery(query, values.flat());
+    }
+
+    console.log("Inserción masiva exitosa");
+} catch (error) {
+    console.error("Error durante la inserción masiva:");
+    console.error(error);
+}
+  //await detalleModel.TblDetallesTmp.createMany(datosOracle);
 
   //3. Crear tabla temporal para la distribucion
   await Database.rawQuery(
-    `TRUNCATE TABLE ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACION`
+    `TRUNCATE TABLE ${Env.get("PREFIJODB")}BOTF_TMP_IDFACTURACION`
   );
   await Database.rawQuery(`
   INSERT INTO ${Env.get("PREFIJODB")}BOTF_TMP_IDFACTURACION
@@ -265,8 +353,6 @@ console.log("Inicio de logica detalle");
   /*
 4. Distribuir los datos en la tabla final
 -------- insertar los nuevos
-
-
 
 */
   await Database.rawQuery(`
@@ -310,5 +396,15 @@ catch (error) {
 
   return true;
 };
+
+async function chunkArray(array: any[], chunkSize: number): any[][] {
+  
+  const chunks = new Array;
+  for (let i = 0; i < array.length; i += chunkSize) {
+      chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
 
 export { consultarOracleEInsertarMSSQL };
