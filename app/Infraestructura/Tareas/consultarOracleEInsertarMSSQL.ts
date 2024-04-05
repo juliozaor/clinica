@@ -276,9 +276,9 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
     */
   
     await Database.rawQuery(`
-    UPDATE ${Env.get("PREFIJODB")}BOTF_FACTURACION SET tregistroId = -1, estadoId = 5
-    WHERE coalesce(tregistroId, 0) = 0 and estadoId = 0 and RPA_FOR_NUMERFORMU IN (SELECT DISTINCT RPA_FOR_NUMERFORMU FROM ${Env.get("PREFIJODB")}BOTF_FACTURACIONDETALLE WHERE TIPO_FORMULARIO = 'individual');
-    `);
+  UPDATE ${Env.get("PREFIJODB")}BOTF_FACTURACION SET tregistroId = -1, estadoId = 5
+  WHERE coalesce(tregistroId, 0) = 0 and estadoId = 0 and RPA_FOR_NUMERFORMU IN (SELECT DISTINCT RPA_FOR_NUMERFORMU FROM ${Env.get("PREFIJODB")}BOTF_FACTURACIONDETALLE WHERE UPPER(TIPO_FORMULARIO) = 'INDIVIDUAL');
+  `);
 
 
    console.log("Fin logica formulario");
