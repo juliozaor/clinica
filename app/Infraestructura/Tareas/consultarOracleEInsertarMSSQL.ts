@@ -55,7 +55,7 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
 
     if (datosOracle?.rows.length > 0) {
       console.log(datosOracle?.rows.length)
-      servicioLogs.Oracle("Ejecutar consulta", `Datos encontrados ${tipo}`);
+     // servicioLogs.Oracle("Ejecutar consulta", `Datos encontrados ${tipo}`);
       if (tipo == 1) {
         console.log("Almacenar Formularios");
        
@@ -129,7 +129,7 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
     batches.push(chunk);
 }
 
-    for (const batch of batches) {
+    for await (const batch of batches) {
         const values = batch.map(dato => [
             dato.AMBITO,
             dato.CODIGOCENTROATEN,
@@ -139,13 +139,14 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
             dato.RPA_FOR_FECHATENCION,
             dato.RPA_FOR_NUMERFORMU,
             dato.RUT_PAC,
-            dato.VALORCTA
+            dato.VALORCTA,
+            dato.RPA_FOR_TIPOFORMU
         ]);
 
-        const placeholders = Array.from({ length: batch.length }, () => '(?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+        const placeholders = Array.from({ length: batch.length }, () => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
         const query = `
         INSERT INTO ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACION
-        (AMBITO, CODIGOCENTROATEN, COD_CONVENIO, CONVENIO, RPA_FOR_FECHADIGIT, RPA_FOR_FECHATENCION, RPA_FOR_NUMERFORMU, RUT_PAC, VALORCTA)
+        (AMBITO, CODIGOCENTROATEN, COD_CONVENIO, CONVENIO, RPA_FOR_FECHADIGIT, RPA_FOR_FECHATENCION, RPA_FOR_NUMERFORMU, RUT_PAC, VALORCTA, RPA_FOR_TIPOFORMU)
         VALUES ${placeholders} `;
 
         await Database.rawQuery(query, values.flat());
@@ -162,6 +163,7 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
   await Database.rawQuery(
     `TRUNCATE TABLE ${Env.get("PREFIJODB")}BOTF_TMP_IDFACTURACION`
   );
+
   await Database.rawQuery(`
   INSERT INTO ${Env.get("PREFIJODB")}BOTF_TMP_IDFACTURACION
   SELECT DISTINCT RPA_FOR_NUMERFORMU FROM ${Env.get(
@@ -187,6 +189,7 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
     a.VALORCTA,
     a.CODIGOCENTROATEN
     
+    
     ,CURRENT_TIMESTAMP as fcarga
     ,0 as estadoId 
     ,CURRENT_TIMESTAMP as fultestado
@@ -202,6 +205,7 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
     ,0 as tregistroId
     ,NULL as causalid
     ,NULL as nfactura
+    ,a.RPA_FOR_TIPOFORMU
   FROM
   ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACION a
     LEFT OUTER JOIN ${Env.get(
@@ -209,8 +213,8 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
     )}BOTF_TMP_IDFACTURACION b on (b.RPA_FOR_NUMERFORMU = a.RPA_FOR_NUMERFORMU)
   WHERE
     b.RPA_FOR_NUMERFORMU IS NULL 
-  ;
 `);
+
 
 	/*
 	4.1. Validar si es SOAT y asignarlo
@@ -265,6 +269,18 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
       SELECT a.RPA_FOR_NUMERFORMU FROM ${Env.get("PREFIJODB")}BOTF_FACTURACIONDETALLE a INNER JOIN ${Env.get("PREFIJODB")}BOTF_ATEPREFLOW b on (b.ATE_PRE_CODIGO = a.ATE_PRE_CODIGO) WHERE b.estadoId = 1);
   `);
 
+
+/*
+    7. PASA A ROBOT AUTOMATICO
+    
+    */
+  
+    await Database.rawQuery(`
+    UPDATE ${Env.get("PREFIJODB")}BOTF_FACTURACION SET tregistroId = -1, estadoId = 5
+    WHERE coalesce(tregistroId, 0) = 0 and estadoId = 0 and RPA_FOR_NUMERFORMU IN (SELECT DISTINCT RPA_FOR_NUMERFORMU FROM ${Env.get("PREFIJODB")}BOTF_FACTURACIONDETALLE WHERE TIPO_FORMULARIO = 'individual');
+    `);
+
+
    console.log("Fin logica formulario");
    
 } catch (error) {
@@ -296,19 +312,13 @@ console.log("Inicio de logica detalle");
 
   //2. Insertar los datos que vienen de Oracle
 
-  try {
-    
-    const chunkSize = 100; // Tamaño del lote
-    const batches = new Array();
-    
-    // Dividir los datos en lotes más pequeños
+  try {    
+    const chunkSize = 100; 
+    const batches = new Array();       
     for (let i = 0; i < datosOracle.length; i += chunkSize) {
         const chunk = datosOracle.slice(i, i + chunkSize);
         batches.push(chunk);
-    }
-    
-
-    // Iterar sobre los lotes y ejecutar la inserción
+    }    
     for (const batch of batches) {
         const values = batch.map(dato => [
             dato.RUT_PAC,
@@ -318,23 +328,22 @@ console.log("Inicio de logica detalle");
             dato.ATE_PRE_CODIGO,
             dato.PRE_PRE_DESCRIPCIO,
             dato.PRE_TIP_DESCRIPCIO,
-            dato.RPA_FOR_FECHATENCION
+            dato.RPA_FOR_FECHATENCION,
+            dato.TIPO_FORMULARIO
         ]);
-
-        const placeholders = Array.from({ length: batch.length }, () => '(?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+        const placeholders = Array.from({ length: batch.length }, () => '(?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
         const query = `
         INSERT INTO ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACIONDETALLE
-        (RUT_PAC, COD_CONVENIO, RPA_FOR_FECHADIGIT, RPA_FOR_NUMERFORMU,ATE_PRE_CODIGO, PRE_PRE_DESCRIPCIO,PRE_TIP_DESCRIPCIO, RPA_FOR_FECHATENCION)
-        VALUES (${placeholders}
-    `;
+        (RUT_PAC, COD_CONVENIO, RPA_FOR_FECHADIGIT, RPA_FOR_NUMERFORMU, ATE_PRE_CODIGO, PRE_PRE_DESCRIPCIO, PRE_TIP_DESCRIPCIO, RPA_FOR_FECHATENCION, TIPO_FORMULARIO)
+        VALUES ${placeholders}`;
+        await Database.rawQuery(query, values.flat());       
 
-        // Ejecutar la consulta raw para el lote actual
-        await Database.rawQuery(query, values.flat());
+        
     }
 
     console.log("Inserción masiva exitosa");
 } catch (error) {
-    console.error("Error durante la inserción masiva:");
+    console.error("Error durante la inserción masiva 2:");
     console.error(error);
 }
   //await detalleModel.TblDetallesTmp.createMany(datosOracle);
@@ -366,6 +375,7 @@ SELECT
 	a.PRE_PRE_DESCRIPCIO,
 	a.PRE_TIP_DESCRIPCIO,
 	a.RPA_FOR_FECHATENCION
+  
 	
 	,CURRENT_TIMESTAMP as fcarga
 	,0 as estadoId 
@@ -377,6 +387,7 @@ SELECT
 	,NULL as fmarcarprestacion
 	,NULL as umarcarprestacion
 	,NULL as fenviobot
+  ,a.TIPO_FORMULARIO
 FROM
 ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACIONDETALLE a
 	LEFT OUTER JOIN ${Env.get(

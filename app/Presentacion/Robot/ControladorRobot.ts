@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
-import { robot } from "App/Dominio/Datos/Entidades/robot";
+import { ROBOT } from "App/Dominio/Datos/Entidades/robot";
 import { ServicioLogs } from "App/Dominio/Datos/Servicios/ServicioLogs";
 import { ConsultasDB } from "App/Infraestructura/Servicios/Consultas";
 
@@ -33,13 +33,14 @@ export default class ControladorDocumentos {
           console.log(error2);
         }
 
-        const facturaR:robot = factura[0];
+        const facturaR:ROBOT = factura[0];
         const detalles=new Array();
         factura.forEach((f) => {
           detalles.push({
             ATE_PRE_CODIGO: f.ATE_PRE_CODIGO,
             PRE_PRE_DESCRIPCIO: f.PRE_PRE_DESCRIPCIO,
             PRE_TIP_DESCRIPCIO: f.PRE_TIP_DESCRIPCIO,
+            TIPO_FORMULARIO: f.TIPO_FORMULARIO
           });
         });
         facturaR.DETALLES = detalles

@@ -1,5 +1,5 @@
 (select 
-admsalud.Funglbgetrutpac(rpa.pac_pac_numero) rut_pac,   
+Funglbgetrutpac(rpa.pac_pac_numero) rut_pac,   
 rpa.CON_CON_CODIGO Cod_Convenio,
 rpa.rpa_for_fechadigit,
 rpa.rpa_for_numerformu,
@@ -30,16 +30,16 @@ case   (p.ATE_PRE_CODIGO) when '931001  ' then 'AGRUPADO'
                            tipo_formulario
                             
 from 
-ADMSALUD.rpa_formulario rpa,
-ADMSALUD.con_convenio c,
-ADMSALUD.ate_prestacion p,
-ADMSALUD.pre_prestacion pr,
-ADMSALUD.PRE_Tipo s 
+rpa_formulario rpa,
+con_convenio c,
+ate_prestacion p,
+pre_prestacion pr,
+PRE_Tipo s 
 
 WHERE  
 Trunc(rpa.rpa_for_fechatencion) >= To_date('2008/01/01', 'yyyy/mm/dd')
 AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
-        To_date(CURRENT_DATE, 'yyyy/mm/dd'))
+        To_date('2024/02/06', 'yyyy/mm/dd'))
         AND rpa.rpa_for_tipoformu = '02  '
        AND rpa.rpa_for_vigencia <> 'N'
        AND rpa.pac_pac_numero NOT IN( 1308, 29062, 5024, 40487,
@@ -53,6 +53,7 @@ AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
        and pr.PRE_PRE_CODIGO=p.ATE_PRE_CODIGO
        and s.PRE_TIP_TIPO=pr.PRE_PRE_TIPO
        AND ATE_PRE_CODIGO <> 'A990    '
+       --AND rpa_for_numerformu ='2311019759'
        
   )     
  union
@@ -69,14 +70,14 @@ rpa.rpa_for_fechatencion,
 (ATC_EST_NUMERO) = '0' then 'INDIVIDUAL'
 end)tipo_formulario
 from 
-ADMSALUD.rpa_formulario rpa,
-ADMSALUD.con_convenio c,
-ADMSALUD.ate_insumos p,
-ADMSALUD.aba_producto pr
+rpa_formulario rpa,
+con_convenio c,
+ate_insumos p,
+aba_producto pr
 WHERE  
 Trunc(rpa.rpa_for_fechatencion) >= To_date('2008/01/01', 'yyyy/mm/dd')
 AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
-        To_date(CURRENT_DATE, 'yyyy/mm/dd'))
+        To_date('2024/02/06', 'yyyy/mm/dd'))
         AND rpa.rpa_for_tipoformu = '02  '
        AND rpa.rpa_for_vigencia <> 'N'
        AND rpa.pac_pac_numero NOT IN( 1308, 29062, 5024, 40487,
@@ -88,5 +89,6 @@ AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
        and rpa.rpa_for_urgencia <> 'S' AND rpa.rpa_for_urgencia <>'H'
        and p.ATE_INS_NUMERFORMU=rpa.RPA_FOR_NUMERFORMU
        and pr.FLD_PRODUCTOCODIGO=p.ATE_INS_CODIGO
+       --and s.PRE_TIP_TIPO=pr.PRE_PRE_TIPO
+       --AND rpa_for_numerformu ='2311019759')
        )
-      
