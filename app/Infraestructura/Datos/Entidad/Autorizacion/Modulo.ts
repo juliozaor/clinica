@@ -23,6 +23,8 @@ export default class TblModulos extends BaseModel {
 
   @column({ columnName: 'mod_orden'}) public orden: number
 
+  @column({ columnName: 'mod_parent'}) public parent: number
+
   @column.dateTime({ autoCreate: true, columnName: 'mod_creado' }) public creacion: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'mod_actualizado' }) public actualizacion: DateTime
@@ -36,6 +38,7 @@ export default class TblModulos extends BaseModel {
     this.estado = modulo.estado
     this.parametro = modulo.parametro
     this.orden = modulo.orden
+    this.parent = modulo.parent
     this.creacion = modulo.creacion
     this.actualizacion = modulo.actualizacion
   }
@@ -50,6 +53,7 @@ export default class TblModulos extends BaseModel {
       this.parametro,
       this.orden,
       this.estado,
+      this.parent,
       this.creacion,
       this.actualizacion
     )

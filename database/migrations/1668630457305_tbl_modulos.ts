@@ -12,6 +12,7 @@ export default class extends BaseSchema {
       table.string('mod_icono')
       table.boolean('mod_estado')
       table.integer('mod_orden')
+      table.integer('mod_parent')
       table.timestamp('mod_creado', { useTz: true }).defaultTo(this.now())
       table.timestamp('mod_actualizado', { useTz: true }).defaultTo(this.now())
     })

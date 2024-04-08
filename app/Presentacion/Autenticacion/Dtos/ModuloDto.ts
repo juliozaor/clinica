@@ -6,6 +6,7 @@ export class ModuloDto{
     public nombre: string
     public ruta: string
     public icono: string
+    public parent: number
     public parametro: string
     public funcionalidad: FuncionalidadDto[]
 
@@ -14,6 +15,7 @@ export class ModuloDto{
         this.nombre = modulo.nombreMostrar
         this.ruta = modulo.ruta
         this.parametro = modulo.parametro
+        this.parent = modulo.parent
         this.icono = modulo.icono
         this.funcionalidad = modulo.funcionalidad.map( funcionalidad => new FuncionalidadDto(funcionalidad))
     }

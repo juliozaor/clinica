@@ -60,12 +60,12 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
         console.log("Almacenar Formularios");
        
         
-        await almacenarFacturas(datosOracle?.rows);
+      //  await almacenarFacturas(datosOracle?.rows);
       }
       if (tipo == 2) {
         console.log("Almacenar Detalles");
         
-        await almacenarDetalles(datosOracle?.rows);
+      //  await almacenarDetalles(datosOracle?.rows);
       }
     } else {
       console.log({tipo});

@@ -13,6 +13,7 @@ export class Modulo {
     private _parametro: string,
     private _orden: number,
     private _estado: boolean = true,
+    private _parent: number,
     private _creacion: DateTime = DateTime.now(),
     private _actualizacion:DateTime = DateTime.now(),
   ){}
@@ -51,6 +52,10 @@ export class Modulo {
 
   public get estado (){
     return this._estado
+  }
+
+  public get parent (){
+    return this._parent
   }
 
   public get creacion (){
