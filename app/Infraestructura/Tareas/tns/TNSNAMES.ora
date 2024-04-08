@@ -1,8 +1,8 @@
-SALUD.WORLD =
+PRUEBAS = 
   (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = scan-clices.clinicaces.loc)(PORT = 1521))
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.130)(PORT = 1521))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
-      (SERVICE_NAME = hiscess)
+      (sid = HISPRU2)
     )
   )

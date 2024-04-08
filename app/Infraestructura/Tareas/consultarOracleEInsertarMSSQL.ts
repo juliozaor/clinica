@@ -15,12 +15,12 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
     await oracledb.initOracleClient();
 
     connection = await oracledb.getConnection({
-      /* connectString: "PRUEBAS",
-      user: "ADMCES",
-      password: "S*STE#AS2021", */
-      connectString: "SALUD.WORLD",
+      connectString: "PRUEBAS",
       user: "ADMCES",
       password: "S*STE#AS2021",
+      /* connectString: "SALUD.WORLD",
+      user: "ADMCES",
+      password: "S*STE#AS2021", */
     });
     servicioLogs.Oracle("Conectar bd", "Conexión establecida");
     console.log("Conexión establecida con Oracle Database");
