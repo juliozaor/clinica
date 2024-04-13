@@ -16,17 +16,30 @@ export default class ControladorDocumentos {
     return documentos
   }
 
+  public async mostrarAgrupadas ({ request}) {
+    const payload = await request.obtenerPayloadJWT()
+    const documentos = await this.service.obtenerDocumentosAgrupados(request.all(), payload.documento)
+    return documentos
+  }
+
   public async causas () {
     const causas = await this.service.obtenerCausas()
     return causas
   }
 
   public async actualizar ({ request, params}:HttpContextContract) {
-    const payload = await request.obtenerPayloadJWT()
-    
+    const payload = await request.obtenerPayloadJWT()    
     const factura:Factura = request.all();
     const {estado,boton} = params;
     const documentos = await this.service.actualizarFactura(estado,factura,payload.documento,boton, payload.idRol);
+    return documentos
+  }
+
+  public async actualizarAgrupados ({ request, params}:HttpContextContract) {
+    const payload = await request.obtenerPayloadJWT()    
+    const factura:Factura[] = Object.values(request.all());
+    const {estado,boton} = params;
+    const documentos = await this.service.actualizarFacturaAgrupados(estado,factura,payload.documento,boton, payload.idRol);
     return documentos
   }
 

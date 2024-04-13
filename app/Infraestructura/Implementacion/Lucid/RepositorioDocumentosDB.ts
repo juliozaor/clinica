@@ -19,7 +19,6 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
     const servicioConsultas = new ConsultasDB();
     if (!factura) {
       const sql = servicioConsultas.actualizarAnalizar(documento, parametro);
-
       try {
         await Database.rawQuery(sql);
       } catch (error) {
@@ -64,6 +63,7 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
       parametro,
       estado
     );
+
     try {
       const f = await Database.rawQuery(sql);
       return f[0];
@@ -84,7 +84,6 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
     const fechaActual = DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss.SSS");
     const datos = this.servicioActualizacion.obtenerKeys(boton);
 
-
     try {
       factura.estadoId = estado;
       factura.fultestado = fechaActual;
@@ -103,8 +102,6 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
       }
 
       delete factura.estado_id;
-
-      console.log(factura);
 
       await Database.from("BOTF_FACTURACION")
         .where("RPA_FOR_NUMERFORMU", factura.RPA_FOR_NUMERFORMU!)
@@ -144,4 +141,138 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
 
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
   };
+
+  async obtenerDocumentosAgrupados(
+    params: any,
+    documento: number
+  ): Promise<{}> {
+    const { estado = 2, parametro } = params;
+    let formularios;
+    formularios = await this.consultarFacturaAgrupada(
+      estado,
+      documento,
+      parametro
+    );
+
+    const servicioConsultas = new ConsultasDB();
+    if (formularios.length <= 0) {
+      const sql = servicioConsultas.actualizarAgrupada(documento, parametro);
+      try {
+        await Database.rawQuery(sql);
+      } catch (error) {
+        console.log(error);
+
+        throw new Error("Error al ejecutar la consulta SQL");
+      }
+
+      //Realizar nuevamente la consulta inicial
+      formularios = await this.consultarFacturaAgrupada(
+        estado,
+        documento,
+        parametro
+      );
+
+      if (formularios.length <= 0) {
+        return "No hay facturas disponibles para este proceso";
+      }
+    }
+
+    for await (const formulario of formularios) {
+
+      const sqlDetalles = servicioConsultas.consultardetalles(
+        formulario.RPA_FOR_NUMERFORMU
+      );
+      const detalles = await Database.rawQuery(sqlDetalles);
+      formulario.detalles = detalles;
+      const fechaDigit = formulario.RPA_FOR_FECHADIGIT;
+      const fechaTencion = formulario.RPA_FOR_FECHATENCION;
+
+      const fechaFormateadaDigit = fechaDigit?.toISOString().slice(0, 16);
+      const fechaFormateadaTencion = fechaTencion?.toISOString().slice(0, 16);
+
+      formulario.RPA_FOR_FECHADIGIT = fechaFormateadaDigit;
+      formulario.RPA_FOR_FECHATENCION = fechaFormateadaTencion;
+    }
+
+    return formularios;
+  }
+
+  consultarFacturaAgrupada = async (
+    estado: number,
+    documento: number,
+    parametro: string
+  ) => {
+    const servicioConsultas = new ConsultasDB();
+    const sql = servicioConsultas.consultarFormularioAgrupado(
+      documento,
+      parametro,
+      estado
+    );
+
+    try {
+      const f = await Database.rawQuery(sql);
+      return f;
+    } catch (error) {
+      console.log(error);
+
+      throw new Error("Error al ejecutar la consulta SQL");
+    }
+  };
+
+  async actualizarFacturaAgrupados(
+    estado: number,
+    facturas: Factura[],
+    documento: string,
+    boton: number,
+    rol: string
+  ): Promise<{}> {
+    const fechaActual = DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    const datos = this.servicioActualizacion.obtenerKeys(boton);
+
+    for await (const factura of facturas) {
+      try {
+        factura.estadoId = estado;
+        factura.fultestado = fechaActual;
+        factura[datos.fechaUsuario] = fechaActual;
+        factura[datos.usuario] = documento;
+  
+        if (factura.RPA_FOR_FECHADIGIT) {
+          factura.RPA_FOR_FECHADIGIT = this.formatearfecha(
+            factura.RPA_FOR_FECHADIGIT
+          );
+        }
+        if (factura.RPA_FOR_FECHATENCION) {
+          factura.RPA_FOR_FECHATENCION = this.formatearfecha(
+            factura.RPA_FOR_FECHATENCION
+          );
+        }
+        delete factura.estado_id;
+        delete factura.detalles;
+        delete factura.pausar;
+        delete factura.procesar;        
+  
+        await Database.from("BOTF_FACTURACION")
+          .where("RPA_FOR_NUMERFORMU", factura.RPA_FOR_NUMERFORMU!)
+          .update(factura);
+          
+  
+        this.servicioLogs.Forms(
+          documento,
+          rol,
+          factura.RPA_FOR_NUMERFORMU!,
+          boton,
+          estado
+        );
+  
+        //return true;
+      } catch (error) {
+        console.log(error);  
+        return error;
+      }
+      
+    }
+    console.log{mensaje:"Se actualizo correctamente"}
+    return {mensaje:"Se actualizo correctamente"}
+    
+  }
 }

@@ -4,6 +4,8 @@ import { Paginador } from '../Paginador';
 
 export interface RepositorioDocumentos {
   obtenerDocumentos(param: any, documento:number): Promise<{}>
+  obtenerDocumentosAgrupados(param: any, documento:number): Promise<{}>
   obtenerCausas(): Promise<{}>
   actualizarFactura(estado:number, factura:Factura, documento:string,boton:number, rol:string): Promise<{}>
+  actualizarFacturaAgrupados(estado:number, factura:Factura[], documento:string,boton:number, rol:string): Promise<{}>
 }

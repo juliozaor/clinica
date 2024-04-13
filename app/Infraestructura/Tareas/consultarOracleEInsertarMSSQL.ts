@@ -15,12 +15,12 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
     await oracledb.initOracleClient();
 
     connection = await oracledb.getConnection({
-      /* connectString: "PRUEBAS",
+      connectString: "PRUEBAS",
+      user: "ADMSALUD",
+      password: "ADMSALUD",
+     /*  connectString: "SALUD.WORLD",
       user: "ADMCES",
       password: "S*STE#AS2021", */
-      connectString: "SALUD.WORLD",
-      user: "ADMCES",
-      password: "S*STE#AS2021",
     });
     servicioLogs.Oracle("Conectar bd", "Conexión establecida");
     console.log("Conexión establecida con Oracle Database");
@@ -140,13 +140,18 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
             dato.RPA_FOR_NUMERFORMU,
             dato.RUT_PAC,
             dato.VALORCTA,
-            dato.RPA_FOR_TIPOFORMU
+            dato.RPA_FOR_TIPOFORMU,
+            dato.TIPO,
+            dato.NOM_PAC,
+            dato.EMPRESA,
+            dato.RPA_FOR_ETDCTA,
+            dato.RPA_FOR_VIGENCIA,
         ]);
 
-        const placeholders = Array.from({ length: batch.length }, () => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+        const placeholders = Array.from({ length: batch.length }, () => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
         const query = `
         INSERT INTO ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACION
-        (AMBITO, CODIGOCENTROATEN, COD_CONVENIO, CONVENIO, RPA_FOR_FECHADIGIT, RPA_FOR_FECHATENCION, RPA_FOR_NUMERFORMU, RUT_PAC, VALORCTA, RPA_FOR_TIPOFORMU)
+        (AMBITO, CODIGOCENTROATEN, COD_CONVENIO, CONVENIO, RPA_FOR_FECHADIGIT, RPA_FOR_FECHATENCION, RPA_FOR_NUMERFORMU, RUT_PAC, VALORCTA, RPA_FOR_TIPOFORMU, TIPO, NOM_PAC, EMPRESA, RPA_FOR_ETDCTA, RPA_FOR_VIGENCIA)
         VALUES ${placeholders} `;
 
         await Database.rawQuery(query, values.flat());
@@ -189,7 +194,6 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
     a.VALORCTA,
     a.CODIGOCENTROATEN
     
-    
     ,CURRENT_TIMESTAMP as fcarga
     ,0 as estadoId 
     ,CURRENT_TIMESTAMP as fultestado
@@ -206,6 +210,12 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
     ,NULL as causalid
     ,NULL as nfactura
     ,a.RPA_FOR_TIPOFORMU
+    ,NULL as RPA_FOR_NUMERFORMU_PID
+    ,a.TIPO
+    ,a.NOM_PAC
+    ,a.EMPRESA
+    ,a.RPA_FOR_ETDCTA
+    ,a.RPA_FOR_VIGENCIA
   FROM
   ${Env.get("PREFIJODB")}BOTF_TMP_FACTURACION a
     LEFT OUTER JOIN ${Env.get(

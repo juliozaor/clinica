@@ -11,12 +11,20 @@ export class ServicioDocumentos{
     return this.repositorio.obtenerDocumentos(params, documento);
   }
 
+  async obtenerDocumentosAgrupados (params: any, documento:number): Promise<{}> {
+    return this.repositorio.obtenerDocumentosAgrupados(params, documento);
+  }
+
   async obtenerCausas (): Promise<{}> {
     return this.repositorio.obtenerCausas();
   }
 
   async actualizarFactura (estado:number, factura:Factura, documento:string,boton:number, rol:string): Promise<{}> {
     return this.repositorio.actualizarFactura(estado, factura,documento,boton, rol);
+  }
+
+  async actualizarFacturaAgrupados (estado:number, factura:Factura[], documento:string,boton:number, rol:string): Promise<{}> {
+    return this.repositorio.actualizarFacturaAgrupados(estado, factura,documento,boton, rol);
   }
 
 }

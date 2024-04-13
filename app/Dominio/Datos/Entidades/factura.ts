@@ -24,7 +24,14 @@ export class Factura {
   descbot?:string;
   nfactura?:string;
   detalles?: Detalle[];
-
+  RPA_FOR_NUMERFORMU_PID?:string
+  procesar?:string
+  pausar?:string
+  TIPO?:string;
+  NOM_PAC?:string;
+  EMPRESA?:string;
+  RPA_FOR_ETDCTA?:string;
+  RPA_FOR_VIGENCIA?:string;
 
 
 

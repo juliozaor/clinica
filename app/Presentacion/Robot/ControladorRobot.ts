@@ -19,7 +19,7 @@ export default class ControladorDocumentos {
     try {
       const factura = await Database.rawQuery(sql);
       if (!factura) {
-        return response.notFound({mensaje:"No se encontraron facturas"})
+        return response.notFound({mensaje:"No se encontraron formularios"})
       }
 
       if (factura.length >= 1) {
@@ -46,11 +46,13 @@ export default class ControladorDocumentos {
         facturaR.DETALLES = detalles
         return response.status(200).send(facturaR);
       }else{
-        return response.notFound({mensaje:"No se encontraron facturas"})
+        return response.notFound({mensaje:"No se encontraron formularios"})
       }
 
     } catch (error) {
-      return response.serviceUnavailable({ error: 'Error al consultar las facturas' })
+      console.log(error);
+      
+      return response.serviceUnavailable({ error: 'Error al consultar las formularios' })
     }
   }
 
@@ -70,4 +72,76 @@ export default class ControladorDocumentos {
       return response.serviceUnavailable({ error: 'Error al ejecutar la consulta SQL' })
     }
   }
+
+  public async actualizarAgrupados({ request, response }:HttpContextContract) {
+    const facturas = request.all();
+
+    const facturasArray = Object.values(facturas);
+
+for (const factura of facturasArray) {
+  const { rpaForNumerformu, estadoId, descripcion, nfactura } = factura;
+  const sql = this.consultas.actualizarRobotRespuesta(
+    rpaForNumerformu,
+    estadoId,
+    descripcion,
+    nfactura
+  );
+  try {
+    await Database.rawQuery(sql);
+    this.servicioLogs.Robot(rpaForNumerformu,descripcion,estadoId);
+  } catch (error2) {
+    return response.serviceUnavailable({ error: 'Error al ejecutar la consulta SQL' })
+  }
+}
+
+    return response.accepted({mensaje:"Respuesta enviada correctamente"});
+    
+  }
+
+  public async obtenerAgrupadas({ response }:HttpContextContract) {
+
+    const sql = this.consultas.obtenerFacturaAgrupadas();
+    
+    try {
+      const formularios = await Database.rawQuery(sql);
+      if (formularios.length <= 0) {
+        return response.notFound({mensaje:"No se encontraron formularios"})
+      }
+
+for await (const factura of formularios) {
+  
+  const sql2 = this.consultas.actualizarRobotConsulta(
+    factura.RPA_FOR_NUMERFORMU
+  );
+  try {
+    await Database.rawQuery(sql2);
+  } catch (error2) {
+    console.log(error2);
+  }
+/* 
+  const facturaR:ROBOT = factura[0];
+  const detalles=new Array();
+  factura.forEach((f) => {
+    detalles.push({
+      ATE_PRE_CODIGO: f.ATE_PRE_CODIGO,
+      PRE_PRE_DESCRIPCIO: f.PRE_PRE_DESCRIPCIO,
+      PRE_TIP_DESCRIPCIO: f.PRE_TIP_DESCRIPCIO,
+      TIPO_FORMULARIO: f.TIPO_FORMULARIO
+    });
+  });
+  facturaR.DETALLES = detalles
+  return response.status(200).send(facturaR); */
+}
+
+return formularios
+
+        
+
+    } catch (error) {
+      console.log(error);
+      
+      return response.serviceUnavailable({ error: 'Error al consultar las formularios' })
+    }
+  }
+
 }
