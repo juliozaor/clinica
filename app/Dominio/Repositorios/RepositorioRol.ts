@@ -3,7 +3,9 @@ import { Rol } from '../Datos/Entidades/Autorizacion/Rol';
 import { Paginador } from '../Paginador';
 
 export interface RepositorioRol {
-  obtenerRolporID(id: string): Promise<Rol>
- /*  guardarRol(rol: Rol): Promise<Rol> */
   obtenerRols(param: any): Promise<{rols: Rol[], paginacion: Paginador}>
+  obtenerTodos(param: any): Promise<{rols: Rol[], paginacion: Paginador}>
+  obtenerPorId(id: string): Promise<Rol>
+  guardar(rol: Rol): Promise<Rol>
+  actualizar(rol: Rol): Promise<Rol>
 }

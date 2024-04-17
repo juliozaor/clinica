@@ -291,7 +291,7 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
       });
     }
 
-    const formulariosDB = await sql.orderBy("NOM_PAC", "asc").paginate(pagina, limite);
+    const formulariosDB = await sql.where("estadoId", 2).orderBy("NOM_PAC", "asc").paginate(pagina, limite);
     formulariosDB.forEach(formularioDB => {
       formularios.push(formularioDB.obtenerFormulario())
     })
@@ -300,22 +300,65 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
     return {formularios , paginacion}
   }
 
-  async obtenerDocumentosBusqueda(
+  async obtenerBusqueda(
     params: any
-  ): Promise<{}> {
-    const { estado = 2, tipo, formularioId } = params;
+  ): Promise<{formularios: Factura[], tipo:string, estado:number}> {
+    const { formularioId, rut } = params;
     let formularios;
+    let tipo = 'INDIVIDUAL';
     const servicioConsultas = new ConsultasDB();
-    const sql = servicioConsultas.consultarFormularioBusqueda(
-      tipo,
-      estado,
-      formularioId
-    );
+    let sql = servicioConsultas.consultarFormularioBusqueda(tipo, formularioId, rut );
 
     try {
-      const formularios = await Database.rawQuery(sql);
-
+      formularios = await Database.rawQuery(sql);
       if (formularios.length <= 0) {
+        tipo = 'AGRUPADO' 
+        sql = servicioConsultas.consultarFormularioBusqueda(tipo, formularioId, rut );
+        formularios = await Database.rawQuery(sql);
+        if (formularios.length <= 0) {
+          return {formularios, tipo, estado: 0};
+        }
+      }
+
+       if(tipo === 'INDIVIDUAL'){
+        const sqlDetalles = servicioConsultas.consultardetalles(
+          formularios[0].RPA_FOR_NUMERFORMU
+        );
+        const detalles = await Database.rawQuery(sqlDetalles);
+        formularios[0].detalles = detalles;
+        const fechaDigit = formularios[0].RPA_FOR_FECHADIGIT;
+        const fechaTencion = formularios[0].RPA_FOR_FECHATENCION;
+    
+        const fechaFormateadaDigit = fechaDigit?.toISOString().slice(0, 16);
+        const fechaFormateadaTencion = fechaTencion?.toISOString().slice(0, 16);
+    
+        formularios[0].RPA_FOR_FECHADIGIT = fechaFormateadaDigit;
+        formularios[0].RPA_FOR_FECHATENCION = fechaFormateadaTencion;
+       }
+
+       if(tipo === 'AGRUPADO'){
+        for await (const formulario of formularios) {
+
+          const sqlDetalles = servicioConsultas.consultardetalles(
+            formulario.RPA_FOR_NUMERFORMU
+          );
+          const detalles = await Database.rawQuery(sqlDetalles);
+          formulario.detalles = detalles;
+          const fechaDigit = formulario.RPA_FOR_FECHADIGIT;
+          const fechaTencion = formulario.RPA_FOR_FECHATENCION;
+    
+          const fechaFormateadaDigit = fechaDigit?.toISOString().slice(0, 16);
+          const fechaFormateadaTencion = fechaTencion?.toISOString().slice(0, 16);
+    
+          formulario.RPA_FOR_FECHADIGIT = fechaFormateadaDigit;
+          formulario.RPA_FOR_FECHATENCION = fechaFormateadaTencion;
+        }
+       }
+
+      return {formularios, tipo, estado: 1};
+
+
+      /* if (formularios.length <= 0) {
         return {estad: 0, mensaje:"No hay facturas disponibles para este proceso"};
       }
 
@@ -336,7 +379,7 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
         formulario.RPA_FOR_FECHATENCION = fechaFormateadaTencion;
       }
   
-      return {estado: 0, formularios};
+      return {estado: 0, formularios}; */
     } catch (error) {
       console.log(error);
 

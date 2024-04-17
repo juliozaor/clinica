@@ -6,6 +6,8 @@ Route.group(() => {
   Route.get('/agrupadas', accion_path + '.mostrarAgrupadas')
   Route.get('/causas', accion_path + '.causas')
   Route.get('/buscar', accion_path + '.buscar')
+  Route.get('/obtener', accion_path + '.obtenerBusqueda')
+
   Route.patch('/:estado/:boton', accion_path + '.actualizar')
   Route.patch('/agrupados/:estado/:boton', accion_path + '.actualizarAgrupados')
 

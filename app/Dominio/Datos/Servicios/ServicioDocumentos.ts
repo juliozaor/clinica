@@ -31,4 +31,8 @@ export class ServicioDocumentos{
     return this.repositorio.buscarDocumentos(params, documento);
   }
 
+  async obtenerBusqueda (params: any, documento:number): Promise<{formularios: Factura[], tipo:string, estado:number}> {
+    return this.repositorio.obtenerBusqueda(params, documento);
+  }
+
 }

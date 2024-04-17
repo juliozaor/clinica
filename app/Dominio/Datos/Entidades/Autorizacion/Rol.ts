@@ -8,7 +8,6 @@ export class Rol {
     private _id: string,
     private _nombre: string,
     private _root: boolean = false,
-    private _parent: number,
     private _estado:boolean = true,
     private _creacion:DateTime = DateTime.now(),
     private _actualizacion:DateTime = DateTime.now()
@@ -22,11 +21,6 @@ export class Rol {
   public get nombre (){
     return this._nombre
   }
-
-  public get parent (){
-    return this._parent
-  }
-
 
   public get modulos (){
     return this._modulos

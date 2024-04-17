@@ -10,26 +10,32 @@ export default class ControladorRol {
   }
 
   public async listar ({ request }) {
-    const empresa = await this.service.obtenerRols(request.all())
-    return empresa
+    const rol = await this.service.obtenerRols(request.all())
+    return rol
   }
 
- /*  public async obtenerRolPorId ({ params }) {
-    const empresa = await this.service.obtenerRolPorId(params.id)
-    return empresa
+  
+  public async listarTodos ({ request }) {
+    const roles = await this.service.obtenerTodos(request.all())
+    return roles
   }
 
-  public async actualizarRol ({ params, request }) {
-    const dataEmpresa = request.all()
-    const empresa = await this.service.actualizarRol(params.id, dataEmpresa)
-    return empresa
-  } */
+  public async obtenerRolPorId ({ params }) {
+    const rol = await this.service.obtenerPorId(params.id)
+    return rol
+  }
+  
+  public async registrar ({ request }) {
+    const datarol = request.all()
+    const rol = await this.service.guardar(datarol)
+    return rol
+  }
+  public async actualizar ({ params, request }) {
+    const datarol = request.all()
+    const rol = await this.service.actualizar(params.id, datarol)
+    return rol
+  }
 
-  /* public async guardarRol ({ request }) {
-    const dataEmpresa = request.all()
-    const empresa = await this.service.guardarRol(dataEmpresa)
-    return empresa
-  } */
 
 /*   public async cambiarEstado ({request, response}:HttpContextContract){
     try{

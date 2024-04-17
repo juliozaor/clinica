@@ -9,7 +9,28 @@ import { Paginador } from '../../../Dominio/Paginador';
 import { MapeadorPaginacionDB } from './MapeadorPaginacionDB';
 
 export class RepositorioRolDB implements RepositorioRol {
-  async obtenerRolporID (idRol: string): Promise<Rol> {
+
+  async obtenerRols (params: any): Promise<{rols: Rol[], paginacion: Paginador}> {
+    const rols: Rol[] = []    
+    const rolesBD = await TblRoles.query().where('rol_root', false).andWhere('rol_estado', true).orderBy('rol_nombre', 'desc').paginate(params.pagina, params.limite)
+    rolesBD.forEach(rolesBD => {
+      rols.push(rolesBD.obtenerRol())
+    })
+    const paginacion = MapeadorPaginacionDB.obtenerPaginacion(rolesBD)
+    return {rols , paginacion}
+  }
+
+  async obtenerTodos (params: any): Promise<{rols: Rol[], paginacion: Paginador}> {
+    const rols: Rol[] = []    
+    const rolesBD = await TblRoles.query().where('rol_root', false).orderBy('rol_nombre', 'desc').paginate(params.pagina, params.limite)
+    rolesBD.forEach(rolesBD => {
+      rols.push(rolesBD.obtenerRol())
+    })
+    const paginacion = MapeadorPaginacionDB.obtenerPaginacion(rolesBD)
+    return {rols , paginacion}
+  }
+
+  async obtenerPorId (idRol: string): Promise<Rol> {
     const rolDB = await TblRoles.findOrFail(idRol)
     let rol = rolDB?.obtenerRol()
     if(!rolDB){
@@ -25,14 +46,6 @@ export class RepositorioRolDB implements RepositorioRol {
     return rol
   }
 
-  async obtenerRols (params: any): Promise<{rols: Rol[], paginacion: Paginador}> {
-    const rols: Rol[] = []    
-    const rolesBD = await TblRoles.query().where('rol_root', false).orderBy('rol_nombre', 'desc').paginate(params.pagina, params.limite)
-    rolesBD.forEach(rolesBD => {
-      rols.push(rolesBD.obtenerRol())
-    })
-    const paginacion = MapeadorPaginacionDB.obtenerPaginacion(rolesBD)
-    return {rols , paginacion}
-  }
+    
 
 }

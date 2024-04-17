@@ -12,24 +12,36 @@ export default class TblRoles extends BaseModel {
 
   @column({ columnName: 'rol_estado' }) public estado: boolean
 
+  @column({ columnName: 'rol_root' }) public root: boolean
+
   @column.dateTime({ autoCreate: true, columnName: 'rol_creado' }) public creacion: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'rol_actualizado' }) public actualizacion: DateTime
 
   public establecerRolTblRoles (rol:Rol):void{
-    this.id = rol.id
     this.nombre = rol.nombre
     this.estado = rol.estado
+    this.root = rol.root
     this.creacion = rol.creacion;
     this.actualizacion = rol.actualizacion;
   }
+
+  public eactualzarrRolTblRoles (rol:Rol):void{
+    this.id = rol.id
+    this.nombre = rol.nombre
+    this.estado = rol.estado
+    this.root = rol.root
+    this.creacion = rol.creacion;
+    this.actualizacion = rol.actualizacion;
+  }
+
 
   public obtenerRol ():Rol{
     return new Rol(
       this.id,
       this.nombre,
+      this.root,
       this.estado,
-      false,
       this.creacion,
       this.actualizacion
     )
