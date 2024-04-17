@@ -8,4 +8,6 @@ export interface RepositorioDocumentos {
   obtenerCausas(): Promise<{}>
   actualizarFactura(estado:number, factura:Factura, documento:string,boton:number, rol:string): Promise<{}>
   actualizarFacturaAgrupados(estado:number, factura:Factura[], documento:string,boton:number, rol:string): Promise<{}>
+  buscarDocumentos(param: any, documento:number): Promise<{formularios: Factura[], paginacion: Paginador}>
+
 }

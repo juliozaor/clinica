@@ -7,6 +7,9 @@ import { DateTime } from "luxon";
 import { ServicioActualizacion } from "App/Infraestructura/Servicios/Actualizar";
 import { ServicioLogs } from "App/Dominio/Datos/Servicios/ServicioLogs";
 import { TblCausas } from "App/Infraestructura/Datos/Entidad/Causas";
+import { Paginador } from "App/Dominio/Paginador";
+import { TblFacturacion } from "App/Infraestructura/Datos/Entidad/Facturacion";
+import { MapeadorPaginacionDB } from "./MapeadorPaginacionDB";
 
 export class RepositorioDocumentosDB implements RepositorioDocumentos {
   private servicioActualizacion = new ServicioActualizacion();
@@ -271,8 +274,77 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
       }
       
     }
-    console.log{mensaje:"Se actualizo correctamente"}
+    console.log({mensaje:"Se actualizo correctamente"})
     return {mensaje:"Se actualizo correctamente"}
+    
+  }
+
+  async buscarDocumentos(param: any, documento: number): Promise<{ formularios: Factura[]; paginacion: Paginador; }> {
+    const formularios: Factura[] = [];
+    const { termino, pagina, limite } = param;
+
+    const sql = TblFacturacion.query();
+    if (termino) {
+      sql.andWhere((subquery) => {
+        subquery.whereRaw("LOWER(RUT_PAC) LIKE LOWER(?)", [`%${termino}%`]);
+        subquery.orWhereRaw("LOWER(RPA_FOR_NUMERFORMU) LIKE LOWER(?)", [`%${termino}%`]);
+      });
+    }
+
+    const formulariosDB = await sql.orderBy("NOM_PAC", "asc").paginate(pagina, limite);
+    formulariosDB.forEach(formularioDB => {
+      formularios.push(formularioDB.obtenerFormulario())
+    })
+
+    const paginacion = MapeadorPaginacionDB.obtenerPaginacion(formulariosDB)
+    return {formularios , paginacion}
+  }
+
+  async obtenerDocumentosBusqueda(
+    params: any
+  ): Promise<{}> {
+    const { estado = 2, tipo, formularioId } = params;
+    let formularios;
+    const servicioConsultas = new ConsultasDB();
+    const sql = servicioConsultas.consultarFormularioBusqueda(
+      tipo,
+      estado,
+      formularioId
+    );
+
+    try {
+      const formularios = await Database.rawQuery(sql);
+
+      if (formularios.length <= 0) {
+        return {estad: 0, mensaje:"No hay facturas disponibles para este proceso"};
+      }
+
+      for await (const formulario of formularios) {
+
+        const sqlDetalles = servicioConsultas.consultardetalles(
+          formulario.RPA_FOR_NUMERFORMU
+        );
+        const detalles = await Database.rawQuery(sqlDetalles);
+        formulario.detalles = detalles;
+        const fechaDigit = formulario.RPA_FOR_FECHADIGIT;
+        const fechaTencion = formulario.RPA_FOR_FECHATENCION;
+  
+        const fechaFormateadaDigit = fechaDigit?.toISOString().slice(0, 16);
+        const fechaFormateadaTencion = fechaTencion?.toISOString().slice(0, 16);
+  
+        formulario.RPA_FOR_FECHADIGIT = fechaFormateadaDigit;
+        formulario.RPA_FOR_FECHATENCION = fechaFormateadaTencion;
+      }
+  
+      return {estado: 0, formularios};
+    } catch (error) {
+      console.log(error);
+
+      throw new Error("Error al ejecutar la consulta SQL");
+    }
+
+      
+
     
   }
 }

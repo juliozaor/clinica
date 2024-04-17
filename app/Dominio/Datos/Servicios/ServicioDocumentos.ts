@@ -27,4 +27,8 @@ export class ServicioDocumentos{
     return this.repositorio.actualizarFacturaAgrupados(estado, factura,documento,boton, rol);
   }
 
+  async buscarDocumentos (params: any, documento:number): Promise<{formularios: Factura[], paginacion: Paginador}> {
+    return this.repositorio.buscarDocumentos(params, documento);
+  }
+
 }

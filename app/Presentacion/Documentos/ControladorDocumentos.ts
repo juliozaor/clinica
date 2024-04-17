@@ -43,4 +43,10 @@ export default class ControladorDocumentos {
     return documentos
   }
 
+  public async buscar ({ request}) {
+    const payload = await request.obtenerPayloadJWT()
+    const documentos = await this.service.buscarDocumentos(request.all(), payload.documento)
+    return documentos
+  }
+
 }
