@@ -321,6 +321,11 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
       }
 
        if(tipo === 'INDIVIDUAL'){
+        
+        if(formularios[0].uanalizarinfo){
+          return {formularios, tipo, estado: 3};       
+        }  
+
         const sqlDetalles = servicioConsultas.consultardetalles(
           formularios[0].RPA_FOR_NUMERFORMU
         );
@@ -337,6 +342,11 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
        }
 
        if(tipo === 'AGRUPADO'){
+
+        if(formularios[0].uanalizarinfo){
+          return {formularios, tipo, estado: 3};       
+        }  
+
         for await (const formulario of formularios) {
 
           const sqlDetalles = servicioConsultas.consultardetalles(

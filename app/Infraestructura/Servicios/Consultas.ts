@@ -273,8 +273,7 @@ and a.RPA_FOR_NUMERFORMU_PID IS NOT NULL
             INNER JOIN HRBOTCES.dbo.BOTF_TREGISTRO_ROL rr on (rr.tregistroId = f.tregistroId)
             INNER JOIN (select distinct RPA_FOR_NUMERFORMU from HRBOTCES.dbo.BOTF_FACTURACIONDETALLE where TIPO_FORMULARIO = '${ tipo }') d on (d.RPA_FOR_NUMERFORMU = f.RPA_FOR_NUMERFORMU)
           where
-            f.estadoId = 2 and
-            COALESCE(f.uanalizarinfo, -1) < 1 ) t2 ON t2.RPA_FOR_NUMERFORMU = SI.RPA_FOR_NUMERFORMU where SI.RPA_FOR_NUMERFORMU ='${ formularioId }';`;
+            f.estadoId = 2 ) t2 ON t2.RPA_FOR_NUMERFORMU = SI.RPA_FOR_NUMERFORMU where SI.RPA_FOR_NUMERFORMU ='${ formularioId }' AND SI.estadoId = 2;`;
   }else{
     return `select SI.*
     FROM
@@ -292,15 +291,14 @@ and a.RPA_FOR_NUMERFORMU_PID IS NOT NULL
           INNER JOIN HRBOTCES.dbo.BOTF_TREGISTRO_ROL rr on (rr.tregistroId = f.tregistroId)
           INNER JOIN (select distinct RPA_FOR_NUMERFORMU from HRBOTCES.dbo.BOTF_FACTURACIONDETALLE where TIPO_FORMULARIO = '${ tipo }') d on (d.RPA_FOR_NUMERFORMU = f.RPA_FOR_NUMERFORMU)
         where
-          f.estadoId = 2 and
-          COALESCE(f.uanalizarinfo, -1) < 1 
+          f.estadoId = 2
       ) h1
       INNER JOIN HRBOTCES.dbo.BOTF_FACTURACION f2 on (h1.RUT_PAC = f2.RUT_PAC)
       INNER JOIN HRBOTCES.dbo.BOTF_TREGISTRO_ROL rr2 on (rr2.tregistroId = f2.tregistroId)
       INNER JOIN (select distinct RPA_FOR_NUMERFORMU from HRBOTCES.dbo.BOTF_FACTURACIONDETALLE where TIPO_FORMULARIO = '${ tipo }') d2 on (d2.RPA_FOR_NUMERFORMU = f2.RPA_FOR_NUMERFORMU)
 
     ) t2 ON t2.RPA_FOR_NUMERFORMU = SI.RPA_FOR_NUMERFORMU
-    where SI.RUT_PAC = '${ rut }';`;
+    where SI.RUT_PAC = '${ rut }' AND SI.estadoId = 2;`;
   }
   
   }
