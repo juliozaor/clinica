@@ -18,9 +18,6 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
       connectString: "PRUEBAS",
       user: "ADMSALUD",
       password: "ADMSALUD",
-     /*  connectString: "SALUD.WORLD",
-      user: "ADMCES",
-      password: "S*STE#AS2021", */
     });
     servicioLogs.Oracle("Conectar bd", "Conexión establecida");
     console.log("Conexión establecida con Oracle Database");
@@ -116,8 +113,6 @@ const almacenarFacturas = async (datosOracle: []) => {
   );
 
   //2. Insertar los datos que vienen de Oracle
-
-
   try {
       
     const chunkSize = 100; // Tamaño del lote
@@ -248,7 +243,7 @@ for (let i = 0; i < datosOracle.length; i += chunkSize) {
   INNER JOIN
       HRBOTCES.dbo.BOTF_AMBITOFLOW RAN
   ON 
-      SI.AMBITO = RAN.AMBITO and RAN.estadoId = 1 and coalesce(SI.tregistroId, 0) = 0 and SI.estadoId = 0 ;
+      SI.AMBITO = RAN.AMBITO and RAN.estadoId = 1 and coalesce(SI.tregistroId, 0) = 0 and SI.estadoId = 0;
   `);
   
   

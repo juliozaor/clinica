@@ -41,7 +41,7 @@ export class ServicioEmail{
       } 
     }
 
-    await this.enviadorEmail.enviarTemplate({
+  /*  await this.enviadorEmail.enviarTemplate({
       asunto: 'Recuperar contraseña.',
       destinatarios: usuarioVerificado.correo,
       de: Env.get('SMTP_USERNAME')
@@ -50,7 +50,7 @@ export class ServicioEmail{
       clave: clave,
       usuario: usuarioVerificado.identificacion,
       logo: Env.get('LOGO')
-    }))
+    })) */
   }
 
   public async verificarUsuario (usuario: string): Promise< Usuario> {
