@@ -188,8 +188,8 @@ async obtenerSoportes(): Promise<any> {
 
 crearCarpetaSiNoExiste = async (factura:string) => {
   const carpeta = await this.obtenerNombreCarpeta(factura.trim())
-  const raiz = `${Env.get('BASEPATH')}/${carpeta}`
-  const rutaAbsoluta = path.resolve(`${raiz}`)
+  //const raiz = `${Env.get('BASEPATH')}/${carpeta}`
+  const rutaAbsoluta = path.resolve(Env.get('BASEPATH'), carpeta)
   if (!fs.existsSync(rutaAbsoluta)) {
       fs.mkdirSync(rutaAbsoluta);
   }
