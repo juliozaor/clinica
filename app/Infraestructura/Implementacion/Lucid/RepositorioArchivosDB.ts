@@ -189,7 +189,10 @@ async obtenerSoportes(): Promise<any> {
 crearCarpetaSiNoExiste = async (factura:string) => {
 if(Env.get('LOCAL')== 1){
   const carpeta = await this.obtenerNombreCarpeta(factura.trim())
+
   const raiz = `${Env.get('BASEPATH')}/${carpeta}`
+  console.log({raiz});
+  
   const rutaAbsoluta = path.resolve(`${raiz}`)
   if (!fs.existsSync(rutaAbsoluta)) {
       fs.mkdirSync(rutaAbsoluta);
@@ -199,6 +202,7 @@ if(Env.get('LOCAL')== 1){
 }else if(Env.get('LOCAL')== 0){
 
   const carpeta = await this.obtenerNombreCarpeta(factura.trim());
+  
   const rutaAbsoluta = `${Env.get('BASEPATH')}\\${carpeta}`;
 
   // Configurar las opciones de conexión al servidor SMB remoto
