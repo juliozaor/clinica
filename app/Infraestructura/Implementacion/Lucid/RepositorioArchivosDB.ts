@@ -199,7 +199,7 @@ if(Env.get('LOCAL')== 1){
 }else if(Env.get('LOCAL')== 0){
 
   const carpeta = await this.obtenerNombreCarpeta(factura.trim());
-  const rutaAbsoluta = `${Env.get('BASEPATH')}/${carpeta}`;
+  const rutaAbsoluta = `${Env.get('BASEPATH')}\\${carpeta}`;
 
   // Configurar las opciones de conexión al servidor SMB remoto
   const options = {
@@ -228,9 +228,6 @@ if(Env.get('LOCAL')== 1){
   }
 
 }
-
-
-
 
 }
 
