@@ -11,7 +11,7 @@ import Env from '@ioc:Adonis/Core/Env';
 import { TblSoporte } from "App/Infraestructura/Datos/Entidad/Soporte";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { ServicioLogs } from "App/Dominio/Datos/Servicios/ServicioLogs";
-import * as SMB2 from 'smb2';
+const SMB2 = require('smb2');
 
 export class RepositorioArchivosDB implements RepositorioArchivo {
   private servicioLogs = new ServicioLogs();
