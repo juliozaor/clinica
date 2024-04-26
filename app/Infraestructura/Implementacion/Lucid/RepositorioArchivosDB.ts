@@ -11,7 +11,7 @@ import Env from '@ioc:Adonis/Core/Env';
 import { TblSoporte } from "App/Infraestructura/Datos/Entidad/Soporte";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { ServicioLogs } from "App/Dominio/Datos/Servicios/ServicioLogs";
-
+import * as SMB2 from 'smb2';
 
 export class RepositorioArchivosDB implements RepositorioArchivo {
   private servicioLogs = new ServicioLogs();
@@ -187,13 +187,51 @@ async obtenerSoportes(): Promise<any> {
 
 
 crearCarpetaSiNoExiste = async (factura:string) => {
+if(Env.get('LOCAL')== 1){
   const carpeta = await this.obtenerNombreCarpeta(factura.trim())
-  //const raiz = `${Env.get('BASEPATH')}/${carpeta}`
-  const rutaAbsoluta = path.resolve(Env.get('BASEPATH'), carpeta)
+  const raiz = `${Env.get('BASEPATH')}/${carpeta}`
+  const rutaAbsoluta = path.resolve(`${raiz}`)
   if (!fs.existsSync(rutaAbsoluta)) {
       fs.mkdirSync(rutaAbsoluta);
   }
   return rutaAbsoluta;
+
+}else if(Env.get('LOCAL')== 0){
+
+  const carpeta = await this.obtenerNombreCarpeta(factura.trim());
+  const rutaAbsoluta = `${Env.get('BASEPATH')}/${carpeta}`;
+
+  // Configurar las opciones de conexión al servidor SMB remoto
+  const options = {
+    share: 'c$', // Nombre de la unidad compartida en el servidor remoto
+  };
+
+  try {
+    // Crear una instancia del cliente SMB2
+    const smbClient = new SMB2(options);
+
+    // Verificar si la carpeta ya existe en el servidor remoto
+    const existeCarpeta = await smbClient.exists(rutaAbsoluta);
+
+    if (!existeCarpeta) {
+      // Crear la carpeta en el servidor remoto si no existe
+      await smbClient.mkdir(rutaAbsoluta);
+    }
+
+    // Cerrar la conexión al cliente SMB2
+    smbClient.close();
+
+    return rutaAbsoluta;
+  } catch (error) {
+    console.error('Error al crear la carpeta en el servidor remoto:', error);
+    throw error; // Relanzar el error para manejarlo en un nivel superior si es necesario
+  }
+
+}
+
+
+
+
 }
 
 
