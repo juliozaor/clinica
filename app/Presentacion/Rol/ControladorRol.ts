@@ -25,7 +25,7 @@ export default class ControladorRol {
     return rol
   }
   
-  public async registrar ({ request }) {
+/*   public async registrar ({ request }) {
     const datarol = request.all()
     const rol = await this.service.guardar(datarol)
     return rol
@@ -34,7 +34,7 @@ export default class ControladorRol {
     const datarol = request.all()
     const rol = await this.service.actualizar(params.id, datarol)
     return rol
-  }
+  } */
 
 
 /*   public async cambiarEstado ({request, response}:HttpContextContract){

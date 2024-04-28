@@ -18,13 +18,13 @@ export class ServicioRol{
     return this.repositorio.obtenerPorId(id)
   }
 
-  async guardar (rol: Rol): Promise<Rol>{
+/*   async guardar (rol: Rol): Promise<Rol>{
     return this.repositorio.guardar(rol);
   }
 
   async actualizar (rol: Rol): Promise<Rol>{
     return this.repositorio.actualizar(rol);
-  }
+  } */
 
 
 }
