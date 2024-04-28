@@ -10,6 +10,7 @@ import { TblCausas } from "App/Infraestructura/Datos/Entidad/Causas";
 import { Paginador } from "App/Dominio/Paginador";
 import { TblFacturacion } from "App/Infraestructura/Datos/Entidad/Facturacion";
 import { MapeadorPaginacionDB } from "./MapeadorPaginacionDB";
+import { TblEstados } from "App/Infraestructura/Datos/Entidad/Estados";
 
 export class RepositorioDocumentosDB implements RepositorioDocumentos {
   private servicioActualizacion = new ServicioActualizacion();
@@ -281,17 +282,33 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
 
   async buscarDocumentos(param: any, documento: number): Promise<{ formularios: Factura[]; paginacion: Paginador; }> {
     const formularios: Factura[] = [];
-    const { termino, pagina, limite } = param;
+    const { termino, pagina, limite, estadoId} = param;
 
-    const sql = TblFacturacion.query();
+    const sql = TblFacturacion.query().preload('estado');
     if (termino) {
       sql.andWhere((subquery) => {
         subquery.whereRaw("LOWER(RUT_PAC) LIKE LOWER(?)", [`%${termino}%`]);
         subquery.orWhereRaw("LOWER(RPA_FOR_NUMERFORMU) LIKE LOWER(?)", [`%${termino}%`]);
       });
+/* 
+      const estados = await TblEstados.query().whereRaw("LOWER(nombre) LIKE LOWER(?)", [`%${termino}%`]);
+      const estadoIds = estados.map((estado) => estado.id);
+          
+      if (estadoIds.length > 0) {        
+        sql.orWhereIn('estadoId', estadoIds);
+      }    */  
+
     }
 
-    const formulariosDB = await sql.where("estadoId", 2).orderBy("NOM_PAC", "asc").paginate(pagina, limite);
+    if (estadoId) {      
+      sql.where('estadoId', estadoId);
+    }
+
+
+    
+
+
+    const formulariosDB = await sql.orderBy("NOM_PAC", "asc").paginate(pagina, limite);
     formulariosDB.forEach(formularioDB => {
       formularios.push(formularioDB.obtenerFormulario())
     })
@@ -326,6 +343,9 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
           return {formularios, tipo, estado: 3};       
         }  
 
+        const estado = await TblEstados.findOrFail(formularios[0].estadoId);
+        formularios[0].nombreEstado = estado.nombre;
+
         const sqlDetalles = servicioConsultas.consultardetalles(
           formularios[0].RPA_FOR_NUMERFORMU
         );
@@ -349,6 +369,10 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
 
         for await (const formulario of formularios) {
 
+          const estado = await TblEstados.findOrFail(formulario.estadoId);
+          formulario.nombreEstado = estado.nombre;
+          
+
           const sqlDetalles = servicioConsultas.consultardetalles(
             formulario.RPA_FOR_NUMERFORMU
           );
@@ -368,28 +392,6 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
       return {formularios, tipo, estado: 1};
 
 
-      /* if (formularios.length <= 0) {
-        return {estad: 0, mensaje:"No hay facturas disponibles para este proceso"};
-      }
-
-      for await (const formulario of formularios) {
-
-        const sqlDetalles = servicioConsultas.consultardetalles(
-          formulario.RPA_FOR_NUMERFORMU
-        );
-        const detalles = await Database.rawQuery(sqlDetalles);
-        formulario.detalles = detalles;
-        const fechaDigit = formulario.RPA_FOR_FECHADIGIT;
-        const fechaTencion = formulario.RPA_FOR_FECHATENCION;
-  
-        const fechaFormateadaDigit = fechaDigit?.toISOString().slice(0, 16);
-        const fechaFormateadaTencion = fechaTencion?.toISOString().slice(0, 16);
-  
-        formulario.RPA_FOR_FECHADIGIT = fechaFormateadaDigit;
-        formulario.RPA_FOR_FECHATENCION = fechaFormateadaTencion;
-      }
-  
-      return {estado: 0, formularios}; */
     } catch (error) {
       console.log(error);
 

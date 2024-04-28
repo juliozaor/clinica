@@ -69,6 +69,7 @@ export class TblFacturacion extends BaseModel {
   formulario.EMPRESA = this.EMPRESA
   formulario.RPA_FOR_ETDCTA = this.RPA_FOR_ETDCTA
   formulario.RPA_FOR_VIGENCIA = this.RPA_FOR_VIGENCIA
+  formulario.estado = this.estado
 
   return formulario
 }

@@ -1,5 +1,6 @@
 
 import { Detalle } from "./detalle";
+import { Estado } from "./estado";
 export class Factura {
   RUT_PAC?:string;
   COD_CONVENIO?:string;
@@ -33,7 +34,7 @@ export class Factura {
   EMPRESA?:string;
   RPA_FOR_ETDCTA?:string;
   RPA_FOR_VIGENCIA?:string;
-
+  estado?:Estado;
 
 
 } 
