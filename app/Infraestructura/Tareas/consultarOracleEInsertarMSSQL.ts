@@ -26,7 +26,7 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
   } catch (error) {
     servicioLogs.Oracle("Conectar bd", "Fallo conexión");
     console.log("Fallo conexion con Oracle Database", error);
-    await connection.close();
+    //await connection.close();
     return { estado: 1, error };
 
   }
