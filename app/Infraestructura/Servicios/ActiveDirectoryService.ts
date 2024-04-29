@@ -95,7 +95,7 @@ export default class ActiveDirectoryService {
   }
 
   public async authenticate(username: string, password: string): Promise<boolean> {
-    if (!username.includes('\\')) {
+    if (!username.includes('@clinicaces.loc')) {
       username = username + '@clinicaces.loc' ;
     }
 

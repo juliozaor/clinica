@@ -6,3 +6,4 @@ coverage
 tmp
 uploads/logos/*
 !uploads/logos/.gitkeep
+.env
