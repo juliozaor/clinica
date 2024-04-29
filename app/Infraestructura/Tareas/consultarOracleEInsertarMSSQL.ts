@@ -21,15 +21,18 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
     });
     servicioLogs.Oracle("Conectar bd", "Conexión establecida");
     console.log("Conexión establecida con Oracle Database");
+    await connection.close();
+    return { estado: 1, mensaje:"Conexión establecida con Oracle Database" };
   } catch (error) {
     servicioLogs.Oracle("Conectar bd", "Fallo conexión");
     console.log("Fallo conexion con Oracle Database", error);
-
+    await connection.close();
     return { estado: 1, error };
+
   }
 
   let consulta: string;
-  try {
+/*   try {
     
     const tipoConsulta = tipo == 1 ? "ora_facturas.sql" : "ora_detalle.sql";
     
@@ -38,11 +41,11 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
     consulta = fs.readFileSync(rutaArchivo, "utf-8");
   } catch (error) {
     return { estado: 2, error };
-  }
-
+  } */
+/* 
   let datosOracle;
   try {
-    console.log("Ejecutando consulta Oracle: ", /* consulta */);
+    console.log("Ejecutando consulta Oracle: ", consulta );
 
     datosOracle = await connection.execute(consulta, [], {
       outFormat: oracledb.OBJECT,
@@ -90,7 +93,7 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
      console.log(error);
 
     await connection.close();
-  }
+  } */
 };
 
 //Almacenar facturas

@@ -13,9 +13,9 @@ export default class ActiveDirectoryService {
 
   public async authenticate(username: string, password: string): Promise<boolean> {
     if (!username.includes('\\')) {
-      username = 'clinicaces.loc\\' + username;
+      username = `clinicaces.loc\\${username}`; // Agregar el dominio al nombre de usuario
     }
-  
+    username = username.replace(/\\\\/g, '\\');
     console.log({username, password});
     
     try {
@@ -41,6 +41,7 @@ export default class ActiveDirectoryService {
     }
   }
 } */
+
 
 /* 'use strict'
 
@@ -73,7 +74,12 @@ export default class ActiveDirectoryService {
 } */
 
 
+
+
+
+
 import ActiveDirectory from 'activedirectory';
+import Env from "@ioc:Adonis/Core/Env";
 
 export default class ActiveDirectoryService {
   private ad: ActiveDirectory;
@@ -81,16 +87,16 @@ export default class ActiveDirectoryService {
   constructor() {
     // Configurar la conexión a Active Directory
     this.ad = new ActiveDirectory({
-      url: 'ldap://clinicaces.loc', // URL del servidor LDAP de Active Directory
-      baseDN: 'DC=clinicaces,DC=loc', // Base DN del dominio
-      username: 'Administrator@clinicaces.loc', // Usuario con permisos para consultar el directorio
-      password: 'S4B1DUR14' // Contraseña del usuario
+      url: 'ldap://192.168.1.20', // IP de tu servidor Active Directory
+      baseDN: 'DC=clinicaces,DC=log', // Base DN de tu dominio
+      username: `${Env.get("DIUSER")}@clinicaces.loc`, // Usuario con permisos para consultar el directorio
+      password: Env.get("DIPASS") // Contraseña del usuario
     });
   }
 
   public async authenticate(username: string, password: string): Promise<boolean> {
     if (!username.includes('\\')) {
-      username = 'clinicaces.loc\\' + username;
+      username = username + '@clinicaces.loc' ;
     }
 
     console.log({username, password});

@@ -78,8 +78,9 @@ export class ServicioAutenticacion {
     try {
       // Autenticar al usuario en Active Directory
       if (Env.get("DIRACT") == 1) {
-      await this.activeDirectoryService.authenticate(usuario, contrasena);
-      isAuthenticated = true;
+        const autenticado = await this.activeDirectoryService.authenticate(usuario, contrasena);
+               
+        if(autenticado) isAuthenticated = true;
       } else if ((await this.encriptador.comparar(contrasena, usuarioVerificado.clave))) {
         isAuthenticated = true;
       }
