@@ -259,7 +259,7 @@ obtenerNombreCarpeta = async (factura:string) => {
 		when c.Aseguradora = 'EPS SURA' THEN concat('890982608_',substring(f.Factura, 0,5),'_',trim(substring(f.Factura, 5,1000)),'_',f.Vr_Factura,'_PBS')
 		when c.Aseguradora = 'EPS SURA NO PBS' THEN concat('890982608_',substring(f.Factura, 0,5),'_',trim(substring(f.Factura, 5,1000)),'_',f.Vr_Factura,'_NO PBS')
 		when c.Aseguradora = 'MEDPLUS' THEN concat('890982608_',substring(f.Factura, 0,5),'_',trim(substring(f.Factura, 5,1000)),'_',f.Vr_Factura)
-		ELSE trim(substring(f.Factura, 5,1000))
+		ELSE concat(substring(f.Factura, 0,5),trim(substring(f.Factura, 5,1000)))
 		
 	END	
 	) as Ruta_Factura
