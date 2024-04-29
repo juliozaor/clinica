@@ -1,4 +1,4 @@
-import ActiveDirectory from 'activedirectory';
+/* import ActiveDirectory from 'activedirectory';
 
 export default class ActiveDirectoryService {
   private ad: ActiveDirectory;
@@ -6,15 +6,20 @@ export default class ActiveDirectoryService {
   constructor() {
     // Configurar la conexión a Active Directory
     this.ad = new ActiveDirectory({
-      url: 'ldap://192.168.1.20', // IP de tu servidor Active Directory
-      baseDN: 'DC=clinicaces,DC=log', // Base DN de tu dominio
+       url: 'ldap://clinicaces.loc', // URL del servidor LDAP de Active Directory
+  baseDN: 'DC=clinicaces,DC=loc', // Base DN del dominio
+  username: 'bot_ces@clinicaces.loc', // Usuario con permisos para consultar el directorio
+  password: 'NoCesn*+' // Contraseña del usuario
     });
   }
 
   public async authenticate(username: string, password: string): Promise<boolean> {
     if (!username.includes('\\')) {
-      username = 'clinicaces.log\\' + username;
+      username = 'clinicaces.loc\\' + username;
     }
+
+    console.log({username, password});
+    
     return new Promise<boolean>((resolve, reject) => {
       this.ad.authenticate(username, password, (err, auth) => {
         if (err) {         
@@ -27,7 +32,7 @@ export default class ActiveDirectoryService {
       });
     });
   }
-}
+} */
 
 /* 'use strict'
 
@@ -58,3 +63,71 @@ export default class ActiveDirectoryService {
     })
   }
 } */
+
+
+
+import ActiveDirectory from 'activedirectory';
+
+export default class ActiveDirectoryService {
+  private ad: ActiveDirectory;
+
+  constructor() {
+    // Configurar la conexión a Active Directory
+    this.ad = new ActiveDirectory({
+      url: 'ldap://clinicaces.loc', // URL del servidor LDAP de Active Directory
+      baseDN: 'DC=clinicaces,DC=loc', // Base DN del dominio
+      username: 'bot_ces@clinicaces.loc', // Usuario con permisos para consultar el directorio
+      password: 'NoCesn*+' // Contraseña del usuario
+    });
+  }
+
+  public async authenticate(username: string, password: string): Promise<boolean> {
+    if (!username.includes('\\')) {
+      username = 'clinicaces.loc\\' + username;
+    }
+
+    console.log({username, password});
+    
+    try {
+      // Realizar la autenticación con Active Directory
+      const auth = await new Promise<boolean>((resolve, reject) => {
+        this.ad.authenticate(username, password, (err, auth) => {
+          if (err) {
+            console.error('Error de autenticación en Active Directory 1:', err);
+            reject(err);
+          } else {
+            console.log('Autenticación exitosa en Active Directory 2:', auth);
+            resolve(auth);
+          }
+        });
+      });
+
+      return auth;
+    } catch (error) {
+      console.error('Error al autenticar con Active Directory 3:', error);
+      return false;
+    }
+  }
+
+  public async userExists(username: string): Promise<boolean> {
+    try {
+      // Realizar una búsqueda de usuario en Active Directory
+      const user = await new Promise<boolean>((resolve, reject) => {
+        this.ad.findUser(username, (err, user) => {
+          if (err) {
+            console.error('Error al buscar usuario en Active Directory 4:', err);
+            reject(err);
+          } else {
+            console.log('Usuario encontrado en Active Directory 5:', user);
+            resolve(user);
+          }
+        });
+      });
+
+      return !!user; // Retorna true si se encontró el usuario, false si no se encontró
+    } catch (error) {
+      console.error('Error al buscar usuario en Active Directory:', error);
+      return false;
+    }
+  }
+}
