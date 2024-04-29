@@ -6,10 +6,8 @@ export default class ActiveDirectoryService {
   constructor() {
     // Configurar la conexión a Active Directory
     this.ad = new ActiveDirectory({
-       url: 'ldap://clinicaces.loc', // URL del servidor LDAP de Active Directory
-  baseDN: 'DC=clinicaces,DC=loc', // Base DN del dominio
-  username: 'bot_ces@clinicaces.loc', // Usuario con permisos para consultar el directorio
-  password: 'NoCesn*+' // Contraseña del usuario
+      url: 'ldap://192.168.1.20', // IP de tu servidor Active Directory
+      baseDN: 'DC=clinicaces,DC=log', // Base DN de tu dominio
     });
   }
 
@@ -17,20 +15,30 @@ export default class ActiveDirectoryService {
     if (!username.includes('\\')) {
       username = 'clinicaces.loc\\' + username;
     }
-
+  
     console.log({username, password});
     
-    return new Promise<boolean>((resolve, reject) => {
-      this.ad.authenticate(username, password, (err, auth) => {
-        if (err) {         
-          console.error('Error de autenticación en Active Directory:', err);
-          reject(err);
-        } else {          
-          console.log(auth);          
-          resolve(auth);
-        }
+    try {
+      // Realizar la autenticación con Active Directory
+      const auth = await new Promise<boolean>((resolve, reject) => {
+        this.ad.authenticate(username, password, (err, auth) => {
+          if (err) {
+            console.error('Error de autenticación en Active Directory:', err);
+            reject(err);
+          } else {
+            console.log('Autenticación exitosa en Active Directory:', auth);
+            resolve(auth);
+          }
+        });
       });
-    });
+  
+      // Si auth es true, la autenticación fue exitosa y la conexión al directorio activo se realizó correctamente
+      return auth;
+    } catch (error) {
+      // Si hay un error, la conexión al directorio activo falló
+      console.error('Error al autenticar con Active Directory:', error);
+      return false;
+    }
   }
 } */
 
@@ -65,7 +73,6 @@ export default class ActiveDirectoryService {
 } */
 
 
-
 import ActiveDirectory from 'activedirectory';
 
 export default class ActiveDirectoryService {
@@ -76,8 +83,8 @@ export default class ActiveDirectoryService {
     this.ad = new ActiveDirectory({
       url: 'ldap://clinicaces.loc', // URL del servidor LDAP de Active Directory
       baseDN: 'DC=clinicaces,DC=loc', // Base DN del dominio
-      username: 'bot_ces@clinicaces.loc', // Usuario con permisos para consultar el directorio
-      password: 'NoCesn*+' // Contraseña del usuario
+      username: 'Administrator@clinicaces.loc', // Usuario con permisos para consultar el directorio
+      password: 'S4B1DUR14' // Contraseña del usuario
     });
   }
 
@@ -93,10 +100,10 @@ export default class ActiveDirectoryService {
       const auth = await new Promise<boolean>((resolve, reject) => {
         this.ad.authenticate(username, password, (err, auth) => {
           if (err) {
-            console.error('Error de autenticación en Active Directory 1:', err);
+            console.error('Error de autenticación en Active Directory:', err);
             reject(err);
           } else {
-            console.log('Autenticación exitosa en Active Directory 2:', auth);
+            console.log('Autenticación exitosa en Active Directory:', auth);
             resolve(auth);
           }
         });
@@ -104,7 +111,7 @@ export default class ActiveDirectoryService {
 
       return auth;
     } catch (error) {
-      console.error('Error al autenticar con Active Directory 3:', error);
+      console.error('Error al autenticar con Active Directory:', error);
       return false;
     }
   }
@@ -115,10 +122,10 @@ export default class ActiveDirectoryService {
       const user = await new Promise<boolean>((resolve, reject) => {
         this.ad.findUser(username, (err, user) => {
           if (err) {
-            console.error('Error al buscar usuario en Active Directory 4:', err);
+            console.error('Error al buscar usuario en Active Directory:', err);
             reject(err);
           } else {
-            console.log('Usuario encontrado en Active Directory 5:', user);
+            console.log('Usuario encontrado en Active Directory:', user);
             resolve(user);
           }
         });
