@@ -20,13 +20,13 @@ export default class TblUsuarios extends BaseModel {
 
   @column({ columnName: 'usn_clave_temporal' }) public claveTemporal: boolean
 
-  @column({ columnName: 'usn_telefono' }) public telefono: string
+  @column({ columnName: 'usn_telefono' }) public telefono?: string
 
-  @column({ columnName: 'usn_correo' }) public correo: string
+  @column({ columnName: 'usn_correo' }) public correo?: string
 
-  @column({ columnName: 'usn_fechaNacimiento' }) public fechaNacimiento: Date
+  @column({ columnName: 'usn_fechaNacimiento' }) public fechaNacimiento?: Date
 
-  @column({ columnName: 'usn_apellido' }) public apellido: string
+  @column({ columnName: 'usn_apellido' }) public apellido?: string
 
   @column({ columnName: 'usn_rol_id' }) public idRol: string
 

@@ -77,6 +77,11 @@ if(termino){
   }
 
   async guardarUsuario (usuario: Usuario): Promise<Usuario> {
+
+    const existe = await TblUsuarios.query().where('identificacion', '=', usuario.identificacion).orWhere('usn_usuario', usuario.usuario).first()
+    if(existe){
+      throw new Error('Ya existe un registro con esta identificación o con este usuario de acceso')
+    }
     let usuarioDB = new TblUsuarios()
     usuarioDB.establecerUsuarioDb(usuario)
     await usuarioDB.save()
@@ -85,9 +90,16 @@ if(termino){
 
   async actualizarUsuario (id: string, usuario: Usuario, payload?:PayloadJWT): Promise<Usuario> {
     let usuarioRetorno = await TblUsuarios.findOrFail(id)
-   /*  const usuarioAnterior = usuarioRetorno; */
-   //console.log(usuario);
    
+    
+   /*  const usuarioAnterior = usuarioRetorno; */
+   console.log(usuario);
+   if (usuario.usuario !== usuarioRetorno.usuario) {
+    const existe = await TblUsuarios.query().where('usn_usuario', usuario.usuario).first()
+    if(existe){
+      throw new Error('Ya existe un registro con este usuario de acceso')
+    }
+   }
     
     usuarioRetorno.estableceUsuarioConId(usuario)
     await usuarioRetorno.save()

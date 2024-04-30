@@ -36,6 +36,8 @@ export default class ControladorUsuario {
   public async actualizarUsuario ({ params, request }) {
     const payload = await request.obtenerPayloadJWT()
     const dataUsuario = request.all()    
+    console.log(dataUsuario);
+    
     const usuario = await this.service.actualizarUsuario(params.id, dataUsuario, payload)
     return usuario
   }
@@ -43,8 +45,14 @@ export default class ControladorUsuario {
   public async guardarUsuario ({ request }) {
     const dataUsuario = request.all()
     const payload = await request.obtenerPayloadJWT()
-    const usuario = await this.service.guardarUsuario(dataUsuario, payload)
-    return usuario
+    try {
+      const usuario = await this.service.guardarUsuario(dataUsuario, payload)
+      return usuario
+      
+    } catch (error) {
+      throw error
+      
+    }
   }
 
   public async cambiarEstado ({request, response}:HttpContextContract){

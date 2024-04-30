@@ -8,10 +8,12 @@ export class ServicioUsuario {
         private repositorioUsuarios: RepositorioUsuario,
     ) { }
 
-    async actualizarInformacionUsuario(informacion: PeticionActualizarUsuario, identificacion: string): Promise<Usuario> {
+    async actualizarInformacionUsuario(informacion: any, identificacion: string): Promise<Usuario> {
         let usuario = await this.obtenerUsuario(identificacion)
-        usuario = this.actualizarInformacion(usuario, informacion)
-        await this.repositorioUsuarios.actualizarUsuario(usuario.id, usuario)
+console.log({informacion});
+
+       /*  usuario = this.actualizarInformacion(usuario, informacion) */
+        await this.repositorioUsuarios.actualizarUsuario(usuario.id, informacion)
         return usuario
     }
 

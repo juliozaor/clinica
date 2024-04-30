@@ -4,10 +4,10 @@ export class Usuario{
   usuario: string;
   identificacion: string;
   nombre: string;
-  apellido: string;
-  fechaNacimiento: Date;
-  correo: string;
-  telefono: string;
+  apellido?: string;
+  fechaNacimiento?: string;
+  correo?: string;
+  telefono?: string;
   estado: boolean;
   clave: string;
   claveTemporal: boolean;
