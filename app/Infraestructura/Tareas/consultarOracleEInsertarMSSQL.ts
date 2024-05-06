@@ -8,17 +8,28 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
   const {ServicioLogs} = await import("../../Dominio/Datos/Servicios/ServicioLogs");
   const servicioLogs = new ServicioLogs();
   let connection;
-  const tnsAdminPath = path.join(__dirname, "tns");
-  process.env.TNS_ADMIN = tnsAdminPath;
+ /*  const tnsAdminPath = path.join(__dirname, "tns");
+  process.env.TNS_ADMIN = tnsAdminPath; */
 
   try {
     await oracledb.initOracleClient();
 
-    connection = await oracledb.getConnection({
+  /*   connection = await oracledb.getConnection({
       connectString: "PRUEBAS",
       user: "ADMSALUD",
       password: "ADMSALUD",
+    }); */
+    const connection = await oracledb.getConnection({
+      user: 'ADMSALUD',
+      password: 'ADMSALUD',
+      connectString: '(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.130)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (sid = HISPRU2)))',
     });
+/*     const connection = await oracledb.getConnection({
+      user: 'ADMCES',
+      password: 'S*STE#AS2021',
+      connectString: '(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = scan-clices.clinicaces.loc)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (sid = hiscess)))',
+    });
+ */
     servicioLogs.Oracle("Conectar bd", "Conexión establecida");
     console.log("Conexión establecida con Oracle Database");
     await connection.close();
