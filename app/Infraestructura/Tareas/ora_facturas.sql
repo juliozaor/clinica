@@ -10,8 +10,8 @@ SELECT Funglbgetrutpac(rpa.pac_pac_numero)                               rut_pac
        Decode(rpa.RPA_FOR_TIPOPROC, 'L', 'LABORATORIO',
                                     'I', 'IMAGENES',
                                     'A', 'PATOLOGIA',
-                                    'C', 'PROCEDIMIENTOS',
-                                    'D', 'CONSULTA',
+                                    'C', 'CONSULTA',
+                                    'D', 'PROCEDIMIENTOS',
                                     'E', 'PROCEDIMIENTOS',
                                     'F', 'PROCEDIMIENTOS',
                                     'G', 'PROCEDIMIENTOS',
@@ -45,12 +45,12 @@ SELECT Funglbgetrutpac(rpa.pac_pac_numero)                               rut_pac
 FROM   rpa_formulario rpa,
        con_convenio c,
        con_empresa e,
-       TAB_TIPOIDENT  I,
+       tab_tipoident I,
        pac_paciente p
        
-WHERE  Trunc(rpa.rpa_for_fechatencion) >= To_date('2008/01/01', 'yyyy/mm/dd')
+WHERE  Trunc(rpa.rpa_for_fechatencion) >= To_date('2022/01/01', 'yyyy/mm/dd')
        AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
-           To_date('2024/02/06', 'yyyy/mm/dd'))
+           To_date('2024/05/06', 'yyyy/mm/dd'))
        AND rpa.rpa_for_tipoformu = '02  '
        AND rpa.rpa_for_vigencia <> 'N'
        AND rpa.pac_pac_numero NOT IN( 1308, 29062, 5024, 40487,
@@ -71,7 +71,7 @@ WHERE  Trunc(rpa.rpa_for_fechatencion) >= To_date('2008/01/01', 'yyyy/mm/dd')
                       WHERE  grp.rpa_for_numerformu = rpa.rpa_for_numerformu
                              AND grp.rpa_for_tipoformu = rpa.rpa_for_tipoformu
                              AND grp.pac_pac_numero = rpa.pac_pac_numero
-                             AND grp.fecprc <= Last_day(To_date('2024/02/21',
+                             AND grp.fecprc <= Last_day(To_date('2024/04/09',
                                                'yyyy/mm/dd')
                                                )
                                                + 1
@@ -88,4 +88,4 @@ WHERE  Trunc(rpa.rpa_for_fechatencion) >= To_date('2008/01/01', 'yyyy/mm/dd')
                                AND ins.ate_ins_numerformu =
                                    rpa.rpa_for_numerformu
                                AND ins.ate_ins_tipoformu = rpa.rpa_for_tipoformu
-                               AND ins.concepago <> 'TP') )
+                               AND ins.concepago <> 'TP') ) 

@@ -8,8 +8,8 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
   const {ServicioLogs} = await import("../../Dominio/Datos/Servicios/ServicioLogs");
   const servicioLogs = new ServicioLogs();
   let connection;
- /*  const tnsAdminPath = path.join(__dirname, "tns");
-  process.env.TNS_ADMIN = tnsAdminPath; */
+  const tnsAdminPath = path.join(__dirname, "tns");
+  process.env.TNS_ADMIN = tnsAdminPath;
 
   try {
     await oracledb.initOracleClient();
@@ -19,31 +19,35 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
       user: "ADMSALUD",
       password: "ADMSALUD",
     }); */
-    const connection = await oracledb.getConnection({
+      connection = await oracledb.getConnection({
+      connectString: "SALUD.WORLD",
+      user: "ADMCES",
+      password: "S*STE#AS2021",
+    });
+/*     const connection = await oracledb.getConnection({
       user: 'ADMSALUD',
       password: 'ADMSALUD',
       connectString: '(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.130)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (sid = HISPRU2)))',
-    });
-/*     const connection = await oracledb.getConnection({
+    }); */
+   /*  const connection = await oracledb.getConnection({
       user: 'ADMCES',
       password: 'S*STE#AS2021',
       connectString: '(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = scan-clices.clinicaces.loc)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (sid = hiscess)))',
-    });
- */
+    }); */
+
     servicioLogs.Oracle("Conectar bd", "Conexión establecida");
     console.log("Conexión establecida con Oracle Database");
-    await connection.close();
-    return { estado: 1, mensaje:"Conexión establecida con Oracle Database" };
+   /*  return { estado: 1, mensaje:"Conexión establecida con Oracle Database" }; */
   } catch (error) {
     servicioLogs.Oracle("Conectar bd", "Fallo conexión");
     console.log("Fallo conexion con Oracle Database", error);
-    //await connection.close();
+    await connection.close();
     return { estado: 1, error };
 
   }
 
   let consulta: string;
-/*   try {
+  try {
     
     const tipoConsulta = tipo == 1 ? "ora_facturas.sql" : "ora_detalle.sql";
     
@@ -52,8 +56,8 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
     consulta = fs.readFileSync(rutaArchivo, "utf-8");
   } catch (error) {
     return { estado: 2, error };
-  } */
-/* 
+  }
+
   let datosOracle;
   try {
     console.log("Ejecutando consulta Oracle: ", consulta );
@@ -104,7 +108,7 @@ const consultarOracleEInsertarMSSQL = async (tipo: number) => {
      console.log(error);
 
     await connection.close();
-  } */
+  }
 };
 
 //Almacenar facturas

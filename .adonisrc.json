@@ -75,8 +75,16 @@
   "build": {
     "copy": [
       {
-        "from": "./app/Dominio/Email/Templates",
-        "to": "./build/app/Dominio/Email/Templates"
+        "from": "./app/Infraestructura/Tareas/tns",
+        "to": "./build/app/Infraestructura/Tareas/tns"
+      },
+      {
+        "from": "./app/Infraestructura/Tareas/ora_detalle.sql",
+        "to": "./build/app/Infraestructura/Tareas/ora_detalle.sql"
+      },
+      {
+        "from": "./app/Infraestructura/Tareas/ora_detalle.sql",
+        "to": "./build/app/Infraestructura/Tareas/ora_facturas.sql"
       }
     ]
   }
