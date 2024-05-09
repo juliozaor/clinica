@@ -15,5 +15,6 @@ export class ROBOT{
     RPA_FOR_TIPOFORMU:string;
     VALORCTA: string;
     CODIGOCENTROATEN: string;
+    ESSOAT:Boolean = false
     DETALLES: DETALLEROBOT[]
  }
