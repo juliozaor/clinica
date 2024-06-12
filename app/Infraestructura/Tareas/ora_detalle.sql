@@ -37,15 +37,14 @@ pre_prestacion pr,
 PRE_Tipo s 
 
 WHERE  
-Trunc(rpa.rpa_for_fechatencion) >= To_date('2008/01/01', 'yyyy/mm/dd')
-AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
-        To_date('2024/02/06', 'yyyy/mm/dd'))
+Trunc(rpa.rpa_for_fechatencion) >= To_date('2022/01/01', 'yyyy/mm/dd')
+AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(SYSDATE) --este campo debe ser la fecha actual
         AND rpa.rpa_for_tipoformu = '02  '
        AND rpa.rpa_for_vigencia <> 'N'
        AND rpa.pac_pac_numero NOT IN( 1308, 29062, 5024, 40487,
                                       43624, 1917, 19058 )
-       AND rpa.rpa_for_fechatencion <> To_date('1900/01/01', 'yyyy/mm/dd')
-       AND rpa.fac_fac_fechafacturacion = To_date('1900/01/01', 'yyyy/mm/dd')
+      AND rpa.rpa_for_fechatencion <> To_date('1900/01/01', 'yyyy/mm/dd')
+      AND rpa.fac_fac_fechafacturacion = To_date('1900/01/01', 'yyyy/mm/dd')
        AND rpa.con_con_codigo <> 'CP      '
        AND rpa.con_con_codigo = c.con_con_codigo
        and rpa.rpa_for_urgencia <> 'S' AND rpa.rpa_for_urgencia <>'H'
@@ -53,9 +52,8 @@ AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
        and pr.PRE_PRE_CODIGO=p.ATE_PRE_CODIGO
        and s.PRE_TIP_TIPO=pr.PRE_PRE_TIPO
        AND ATE_PRE_CODIGO <> 'A990    '
-       --AND rpa_for_numerformu ='2311019759'
-       
-  )     
+       --AND rpa_for_numerformu IN ('2404011363')
+)     
  union
  (select 
 Funglbgetrutpac(rpa.pac_pac_numero) rut_pac,   
@@ -75,9 +73,8 @@ con_convenio c,
 ate_insumos p,
 aba_producto pr
 WHERE  
-Trunc(rpa.rpa_for_fechatencion) >= To_date('2008/01/01', 'yyyy/mm/dd')
-AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
-        To_date('2024/02/06', 'yyyy/mm/dd'))
+Trunc(rpa.rpa_for_fechatencion) >= To_date('2022/01/01', 'yyyy/mm/dd')
+AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(SYSDATE) --fecha actual que se esta ejecutando
         AND rpa.rpa_for_tipoformu = '02  '
        AND rpa.rpa_for_vigencia <> 'N'
        AND rpa.pac_pac_numero NOT IN( 1308, 29062, 5024, 40487,
@@ -90,5 +87,5 @@ AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
        and p.ATE_INS_NUMERFORMU=rpa.RPA_FOR_NUMERFORMU
        and pr.FLD_PRODUCTOCODIGO=p.ATE_INS_CODIGO
        --and s.PRE_TIP_TIPO=pr.PRE_PRE_TIPO
-       --AND rpa_for_numerformu ='2311019759')
+       --AND rpa_for_numerformu IN('2404011363')
        )

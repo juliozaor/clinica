@@ -70,8 +70,8 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
     //const relativePath = Env.get('BASEPATH');    
     const  rutaAbsoluta  = await this.crearCarpetaSiNoExiste(factura);
 
+    const absolutePath = path.resolve(`${rutaAbsoluta}/${nombre}.pdf`);
     try {
-        const absolutePath = path.resolve(`${rutaAbsoluta}/${nombre}.pdf`);
 
         let archivo = fs.readFileSync(`${absolutePath}`, 'base64');
         this.servicioLogs.Archivo(factura,nombre,'Consultar',documento,'Exitoso')
@@ -81,7 +81,7 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
       this.servicioLogs.Archivo(factura,nombre,'Consultar',documento,'Fallo')
       
         return {
-            mensaje: `No se encontro el archivo solicitado`,
+            mensaje: `No se encontro el archivo solicitado en la ruta: ${rutaAbsoluta}`,
             error: 6
         }
 
@@ -102,7 +102,10 @@ async actualizarArchivo(archivo: any, nombre: string, factura:string, documento:
   } catch (error) {
     this.servicioLogs.Archivo(factura,nombre,'Actualizar',documento,'Fallo')
 
-    console.log(error);
+    return {
+      mensaje: `No se encontro el archivo solicitado en la ruta: ${rutaAbsoluta}`,
+      error: 6
+  }
     
   }
 
@@ -117,14 +120,15 @@ async eliminarArchivo(nombre: string, factura:string, documento: string, id:numb
   }
 
   const carpeta = await this.obtenerNombreCarpeta(factura.trim())
-  const raiz = `${Env.get('BASEPATH')}/${carpeta}`
+  const raiz = `${Env.get('BASEPATH')}/${carpeta}/${nombre}.pdf`
   const absolutePath = path.resolve(`${raiz}`)
+  
 
   const eliminarArchivo = (rutaArchivo) => {
     return new Promise((resolve, reject) => {
         fs.unlink(rutaArchivo, (err) => {
             if (err) {
-                reject(`Error al eliminar el archivo: ${err.message}`);
+                reject(`Error al eliminar el archivo en la carpeta: ${carpeta}`);
             } else {
                 resolve('El archivo se ha eliminado correctamente.');
             }

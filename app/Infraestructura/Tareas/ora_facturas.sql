@@ -49,8 +49,7 @@ FROM   rpa_formulario rpa,
        pac_paciente p
        
 WHERE  Trunc(rpa.rpa_for_fechatencion) >= To_date('2022/01/01', 'yyyy/mm/dd')
-       AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(
-           To_date('2024/05/06', 'yyyy/mm/dd'))
+       AND Trunc(rpa.rpa_for_fechatencion) <= Last_day(SYSDATE)
        AND rpa.rpa_for_tipoformu = '02  '
        AND rpa.rpa_for_vigencia <> 'N'
        AND rpa.pac_pac_numero NOT IN( 1308, 29062, 5024, 40487,
@@ -71,9 +70,7 @@ WHERE  Trunc(rpa.rpa_for_fechatencion) >= To_date('2022/01/01', 'yyyy/mm/dd')
                       WHERE  grp.rpa_for_numerformu = rpa.rpa_for_numerformu
                              AND grp.rpa_for_tipoformu = rpa.rpa_for_tipoformu
                              AND grp.pac_pac_numero = rpa.pac_pac_numero
-                             AND grp.fecprc <= Last_day(To_date('2024/04/09',
-                                               'yyyy/mm/dd')
-                                               )
+                             AND grp.fecprc <= Last_day(SYSDATE)
                                                + 1
                                                )
        AND ( EXISTS(SELECT 'x'
