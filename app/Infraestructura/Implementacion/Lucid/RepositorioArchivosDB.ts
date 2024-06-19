@@ -19,7 +19,7 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
   async obtenerFacturas(params: any, documento: string): Promise<{ facturaRpa: FacturaRPA[]; paginacion: Paginador; }> {
     const {termino, pagina, limite } = params;
     const facturaRpa: FacturaRPA[] = [];
-    let sql = TblFacturaRPA.query()
+    /* let sql = TblFacturaRPA.query()
         .orderBy("ID_Factura", "desc");      
       if (termino) {
         sql.andWhere((subquery) => {
@@ -34,9 +34,39 @@ export class RepositorioArchivosDB implements RepositorioArchivo {
           subquery.orWhereRaw("LOWER(cod_convenio) LIKE LOWER(?)", [`%${termino}%`]);
           subquery.orWhereRaw("LOWER(Tipo_Factura) LIKE LOWER(?)", [`%${termino}%`]);
         });
+      } */
+        let sql = Database.query()  // Asegúrate de usar Database.query() para iniciar el query builder
+        .from('FacturaRPA as subquery')
+        .select(
+          'subquery.factura',
+          Database.raw('MAX(subquery.cod_convenio) as cod_convenio'),
+          Database.raw('MAX(subquery.estado) as estado'),
+          Database.raw('MAX(subquery.ambito) as ambito'),
+          Database.raw('MAX(subquery.descripcion_convenio) as descripcion_convenio'),
+          Database.raw('MAX(subquery.vr_factura) as vr_factura'),
+          Database.raw('MAX(subquery.fecha_facturacion) as fecha_facturacion'),
+          Database.raw('MAX(subquery.documento_identificacion) as documento_identificacion'),
+          Database.raw('MAX(subquery.nro_planilla) as nro_planilla'),
+          Database.raw('MAX(subquery.fecha_formulario) as fecha_formulario'),
+          Database.raw('MAX(subquery.id_factura) as id_factura'),
+          Database.raw('MAX(subquery.tipo_factura) as tipo_factura')
+        )
+        .groupBy('subquery.factura');
+    
+      if (termino) {
+        sql.andWhere((subquery) => {
+          subquery.where('subquery.factura', 'LIKE', `%${termino}%`)
+            .orWhereRaw('LOWER(subquery.estado) LIKE LOWER(?)', [`%${termino}%`])
+            .orWhereRaw('LOWER(subquery.ambito) LIKE LOWER(?)', [`%${termino}%`])
+            .orWhereRaw('LOWER(subquery.descripcion_convenio) LIKE LOWER(?)', [`%${termino}%`])
+            .orWhereRaw('LOWER(subquery.cod_convenio) LIKE LOWER(?)', [`%${termino}%`])
+            .orWhereRaw('LOWER(subquery.Documento_Identificacion) LIKE LOWER(?)', [`%${termino}%`])
+            .orWhereRaw('LOWER(subquery.tipo_factura) LIKE LOWER(?)', [`%${termino}%`]);
+        });
       }
+    
 
-      const facturasDB = await sql.paginate(pagina, limite);
+      const facturasDB:any = await sql.paginate(pagina, limite);
 
       facturasDB.forEach((faturaDB) => {
         facturaRpa.push(faturaDB);
