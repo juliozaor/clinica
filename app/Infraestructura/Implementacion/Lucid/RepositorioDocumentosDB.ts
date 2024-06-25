@@ -299,6 +299,7 @@ export class RepositorioDocumentosDB implements RepositorioDocumentos {
       }    */  
 
     }
+    sql.whereIn('estadoId', [0,2,10]);
 
     if (estadoId) {      
       sql.where('estadoId', estadoId);
