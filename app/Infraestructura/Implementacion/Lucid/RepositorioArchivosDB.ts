@@ -274,31 +274,53 @@ obtenerNombreCarpeta = async (factura:string) => {
   try {
     const carpeta = await Database.rawQuery(`
     select
-	f.Factura,
-	substring(f.Factura, 0,4) as alfa_num_factura,
-	trim(substring(f.Factura, 5,1000)) as numero_factura,
-	f.Convenio,
-	f.Descripcion_Convenio,
-	f.Rut,
-	c.Aseguradora,
-	f.Vr_Factura,
-	f.Fecha_Facturacion,
-	f.Documento_Identificacion,
-	f.Nro_Planilla,
-	f.Ambito,
-	f.FEcha_Formulario,
-	f.ID_Factura,
-	f.Tipo_Factura,
-	(CASE 
-		when c.Aseguradora = 'EPS SURA' THEN concat('890982608_',substring(f.Factura, 0,5),'_',trim(substring(f.Factura, 5,1000)))
-		when c.Aseguradora = 'MEDPLUS' THEN concat('890982608_',substring(f.Factura, 0,5),'_',trim(substring(f.Factura, 5,1000)),'_',f.Vr_Factura)
-		ELSE concat(substring(f.Factura, 0,5),trim(substring(f.Factura, 5,1000)))		
-	END	
-	) as Ruta_Factura
-	
-from Factura f inner join Convenio c on (c.cod_convenio = f.Convenio) 
-where
-f.Factura = '${factura}'
+        f.Factura,
+        substring(f.Factura, 0,4) as alfa_num_factura,
+        trim(substring(f.Factura, 5,1000)) as numero_factura,
+        f.Convenio,
+		f.Descripcion_Convenio,
+		f.Rut,
+		c.Aseguradora,
+		f.Vr_Factura,
+		f.Fecha_Facturacion,
+		f.Documento_Identificacion,
+		f.Nro_Planilla,
+		f.Ambito,
+		f.FEcha_Formulario,
+		f.ID_Factura,
+		f.Tipo_Factura,		
+        (CASE	 
+	       when bcs.COD_CONVENIO is not null
+            then case
+                when f.Fecha_Facturacion >= '2022-01-01' and f.Fecha_Facturacion < '2023-04-01' then concat(substring(f.Factura, 0,4), trim(substring(f.Factura, 5,1000)))
+                when f.Fecha_Facturacion >= '2023-04-01' then concat(substring(f.Factura, 0,4), trim(substring(f.Factura, 5,1000)), ' ', bcs.CONVENIO)
+                else null 
+            end	         
+            when bcs2.COD_CONVENIO is not null
+            then case
+                when f.Fecha_Facturacion >= '2022-01-01' and f.Fecha_Facturacion < '2023-04-01' then concat('890982608_', substring(f.Factura, 0,4),'_', trim(substring(f.Factura, 5,1000)))
+	        	when f.Fecha_Facturacion >= '2023-04-01' then concat('890982608_', substring(f.Factura, 0,4),'_', trim(substring(f.Factura, 5,1000)),'_',f.Vr_Factura,'_PBS')
+                else null 
+            end	     
+            
+	         when bcs3.COD_CONVENIO is not null
+            then case
+             	when f.Fecha_Facturacion >= '2022-01-01' and f.Fecha_Facturacion < '2023-04-01' then concat(substring(f.Factura, 0,4), trim(substring(f.Factura, 5,1000)))
+	        	when f.Fecha_Facturacion >= '2023-04-01' then concat('890982608_', substring(f.Factura, 0,4),'_', trim(substring(f.Factura, 5,1000)))
+                else null 
+            end     
+	        
+			when c.Aseguradora = 'MEDPLUS' THEN concat('890982608_',substring(f.Factura, 0,5),'_',trim(substring(f.Factura, 5,1000)),'_',f.Vr_Factura)
+			ELSE concat(substring(f.Factura, 0,5),trim(substring(f.Factura, 5,1000)))     
+        END) as Ruta_Factura
+    from Factura f 
+    left join Convenio c on c.cod_convenio = f.Convenio        
+    left outer join BOTF_CONV_SOAT bcs on bcs.COD_CONVENIO = f.Convenio  
+    left outer join BOTF_CONV_SURA bcs2 on bcs2.COD_CONVENIO = f.Convenio   
+    
+    left outer join BOTF_CONV_SURAMERICANA bcs3 on bcs3.COD_CONVENIO = f.Convenio
+    where
+   f.Factura = '${factura}'
     `)
 
     /* CASE 
